@@ -41,8 +41,28 @@ Detail in [[Networking]] and [[Player]].
 Gotcha: Unity 6 replaced `Used By Composite` with a **Composite Operation**
 dropdown — see [[House Layout]].
 
+## 2026-09-11 (later still) — monster AI
+
+Host-authoritative patrol -> chase, verified in sync across both instances.
+
+- `MonsterAI` state machine, server-only `FixedUpdate`, state in a
+  `NetworkVariable`
+- Line-of-sight detection against the `Walls` layer
+- `MonsterSpawner` spawns it on `OnServerStarted` (host only)
+- `IPathfinder` seam so A\* drops in later — see [[Monster AI]]
+
+Gotchas hit:
+
+- Prefab conversion nulled the scene waypoint references. Fixed with a
+  `PatrolRoute` scene singleton.
+- Monster spawning at origin sat on top of the players and instantly chased,
+  so patrol was never visible. Moved its spawn to a corner.
+- Code-spawned prefabs must be registered in `DefaultNetworkPrefabs.asset`.
+  The Player prefab is exempt — `NetworkConfig.PlayerPrefab` covers it.
+
 ## Next
 
-- [ ] Monster patrol -> chase ([[Monster AI]])
+- [ ] Decide what happens when the monster catches a player ([[Monster AI]])
+- [ ] Task objects with networked completion ([[Tasks]])
 - [ ] Monster patrol -> chase ([[Monster AI]])
 - [ ] Task objects with networked completion ([[Tasks]])

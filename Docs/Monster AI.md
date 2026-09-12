@@ -1,6 +1,6 @@
 # Monster AI
 
-Not yet built. Planned for v1 — see [[Scope Plan]].
+Built for v1. Patrol -> chase working, verified across host and client.
 
 ## Requirements
 
@@ -9,29 +9,70 @@ result, so every client sees the same monster in the same place doing the
 same thing. Clients never simulate the monster independently. See
 [[Architecture]].
 
-## v1 states
+## v1 states — built
 
-Keep it to two. Resist adding more until these feel right.
+`Assets/Scripts/Monster/MonsterAI.cs`
 
-- **Patrol** — follow a fixed route through the house
-- **Chase** — move toward a detected player
+- **Patrol** — walks `PatrolRoute` children in order, looping
+- **Chase** — moves toward the detected player
 
-Transition: patrol -> chase on detection; chase -> patrol on losing the
-player.
+State lives in a `NetworkVariable<State>` so clients can drive audio and
+animation off it later without extra RPCs.
 
-## Pathfinding
+### Detection
 
-Unity NavMesh is 3D-first and awkward for 2D top-down. Plan is A* or
-grid-based pathfinding over the tilemap. Decide once [[House Layout]] exists
-— the layout shape drives the pathfinding choice.
+- `detectionRadius` 4 — enter chase
+- `loseInterestRadius` 9 — leave chase
+
+The gap between them is deliberate **hysteresis**. Equal values make a player
+at the boundary flicker between states every frame.
+
+- Line of sight: `Physics2D.Raycast` against the `Walls` layer (layer 6).
+  Walls genuinely hide players — the core hiding mechanic.
+
+### Tuning
+
+Select the Monster prefab to see gizmos: yellow = detection radius, orange =
+lose-interest radius, cyan = patrol route.
+
+## Pathfinding — deliberately deferred
+
+Currently `DirectPathfinder`: walk straight at the target. Correct in one
+open room, wrong as soon as the house has concave geometry.
+
+**A\* is a swap-in, not a rewrite**, because movement goes through
+`IPathfinder.GetNextStep()` — the single place direction is computed. Adding
+A\* means one new class implementing that interface; the state machine,
+networking, and detection are untouched.
+
+Deferred because in a single open room, correct A\* and broken A\* look
+identical — it would be untestable code. Build it when [[House Layout]] has
+multiple rooms to path around.
+
+Keep the seam honest: never compute `(target - pos).normalized` outside
+`MoveToward()`.
 
 ## Prior art
 
 BABEL used enemy/boss AI state machines. Same pattern applies; the new part
 is that state lives on the host and replicates, rather than running locally.
 
+## Gotcha: prefabs cannot reference scene objects
+
+The waypoint array was originally `[SerializeField] Transform[]` assigned in
+the scene. Converting the Monster to a prefab **silently nulled every entry**
+— a prefab asset lives on disk and cannot hold references to objects that
+exist only in a scene.
+
+Fix: `PatrolRoute` is a scene singleton the monster looks up in
+`OnNetworkSpawn`. Same pattern as `SpawnManager` for [[Player]] spawns.
+
+Watch for this with any prefab that needs scene data.
+
 ## Open questions
 
-- Detection: line of sight, radius, or both?
-- What does catching a player do? (No death/spectator system designed yet.)
-- Does the monster path around walls in v1, or patrol a hand-placed route?
+- **What happens when the monster catches a player?** Nothing currently — it
+  just overlaps and shoves. Options: respawn, spectator, or downed+revivable.
+  Needed before v1 is really playable.
+- Should chase have a memory/investigate state (move to last known position)
+  rather than instantly giving up?

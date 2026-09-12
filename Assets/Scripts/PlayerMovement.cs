@@ -8,11 +8,13 @@ public class PlayerMovement : NetworkBehaviour
     [SerializeField] private float moveSpeed = 5f;
 
     private Rigidbody2D rb;
+    private PlayerState state;
     private Vector2 inputDirection;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        state = GetComponent<PlayerState>();
     }
 
     public override void OnNetworkSpawn()
@@ -30,6 +32,7 @@ public class PlayerMovement : NetworkBehaviour
     private void Update()
     {
         if (!IsOwner) return;
+        if (state != null && state.IsCaught) return;
 
         var keyboard = Keyboard.current;
         if (keyboard == null) return;
@@ -59,6 +62,15 @@ public class PlayerMovement : NetworkBehaviour
     private void FixedUpdate()
     {
         if (!IsServer) return;
+
+        // Enforced server-side too: a client that ignores its own caught flag
+        // still does not get to move.
+        if (state != null && state.IsCaught)
+        {
+            inputDirection = Vector2.zero;
+            rb.linearVelocity = Vector2.zero;
+            return;
+        }
 
         rb.linearVelocity = inputDirection * moveSpeed;
     }
