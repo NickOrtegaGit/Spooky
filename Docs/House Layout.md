@@ -5,7 +5,28 @@
 1-2 hand-built layouts using Unity's Tilemap. Non-procedural. Enough for the
 monster to patrol and tasks to be placed in.
 
-Needs: walls with colliders, rooms, connecting hallways.
+### Built so far
+
+One room, in `SampleScene`:
+
+- `Grid` -> `Floor` (order 0) and `Walls` (order 1)
+- Floor: 16x8, origin (-8,-4)
+- Walls: 18x11, origin (-9,-6) — encloses the floor
+- Walls carry `TilemapCollider2D` + `CompositeCollider2D` + static
+  `Rigidbody2D`
+
+Static walls need **no** `NetworkObject` — they are identical in the scene on
+every client. Only things that move or change state need network identity.
+
+### Unity 6 note
+
+`TilemapCollider2D` no longer has a `Used By Composite` checkbox. It is now a
+**Composite Operation** dropdown — set it to **Merge**. Without it, each tile
+keeps its own collider and players catch on the seams.
+
+### Still needed
+
+Multiple rooms, hallways, a second layout.
 
 ## v3 — procedural, deterministic
 

@@ -30,9 +30,19 @@ Detail in [[Networking]] and [[Player]].
 - **Stale build holding UDP 7777** caused `transport start failure` on the
   next host. Always fully quit the build first. See [[Networking]].
 
+## 2026-09-11 (later) — spawn points + first room
+
+- `SpawnManager` assigns positions round-robin; server-only, set in
+  `OnNetworkSpawn` before `NetworkTransform`'s first update so clients never
+  see a snap from origin. Four points at (+/-2, +/-2).
+- First tilemap room painted, 16 PPU. Wall collision verified on **both**
+  host and client.
+
+Gotcha: Unity 6 replaced `Used By Composite` with a **Composite Operation**
+dropdown — see [[House Layout]].
+
 ## Next
 
-- [ ] Spawn points — players currently overlap at `0,0,0`
-- [ ] Walls + a hand-built room ([[House Layout]])
+- [ ] Monster patrol -> chase ([[Monster AI]])
 - [ ] Monster patrol -> chase ([[Monster AI]])
 - [ ] Task objects with networked completion ([[Tasks]])

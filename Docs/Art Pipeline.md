@@ -20,9 +20,22 @@ Not yet configured. When real sprites land, set on each texture:
 
 Consider the Pixel Perfect Camera component for stable pixel rendering.
 
+## Settled: 16 PPU
+
+**16x16 pixel tiles = 1 Unity unit.** Use this everywhere. The player is 1
+unit, so exactly one tile — convenient for the grid-based pathfinding in
+[[Monster AI]].
+
 ## Current state
 
-Placeholder green square on the [[Player]] prefab. No real art yet.
+Placeholder art only:
+
+- Green square on the [[Player]] prefab
+- `Assets/Art/Tiles/wall_placeholder.png` — grey, dark 1px border
+- `Assets/Art/Tiles/floor_placeholder.png` — dark checker
+
+Both 16x16, imported at Point filter / no compression / 16 PPU. Swapping in
+real Aseprite art is a one-field change on the Tile asset.
 
 ## Lighting
 
