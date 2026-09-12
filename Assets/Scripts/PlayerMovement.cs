@@ -19,6 +19,12 @@ public class PlayerMovement : NetworkBehaviour
     {
         // Only the server simulates physics; remote copies are driven by NetworkTransform.
         rb.bodyType = IsServer ? RigidbodyType2D.Dynamic : RigidbodyType2D.Kinematic;
+
+        // The server decides where players start so every client agrees.
+        if (IsServer && SpawnManager.Instance != null)
+        {
+            transform.position = SpawnManager.Instance.GetSpawnPosition();
+        }
     }
 
     private void Update()
