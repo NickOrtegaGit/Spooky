@@ -13,6 +13,10 @@ Tone: scary but silly, not grim.
 - [[Tech Stack]] — versions and tools
 - [[Progress Log]] — what's actually built
 
+## Design
+
+- [[Gameplay Loop]] — the shape of a full round
+
 ## Systems
 
 - [[Networking]]

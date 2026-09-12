@@ -41,6 +41,16 @@ Safer default: host generates, then sends the resulting layout data. Sharing
 only the seed requires the generation code to be perfectly deterministic
 across machines, which is easy to get subtly wrong.
 
+## Hard constraint: rooms must read as rooms
+
+[[Gameplay Loop]] has players finding tasks by **inferring location from
+description** — "cook something" means find the kitchen. That only works if
+a kitchen looks like a kitchen.
+
+This constrains v3 procedural generation more than it first appears: rooms
+cannot be randomly furnished. Generation has to place *coherent* rooms, or
+the core exploration mechanic breaks.
+
 ## Feeds into
 
 - [[Monster AI]] — patrol routes and pathfinding grid come from the layout

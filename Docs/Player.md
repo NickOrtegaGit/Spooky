@@ -36,6 +36,38 @@ Key details:
 Expected: slight input lag on your own cube. That is the server-authoritative
 design working, not a bug. Client-side prediction would fix it; not needed yet.
 
+## Animation
+
+Art: `Assets/Art/Players/P1/Player_1.aseprite` — 8 tags (`idle_` / `walk_`
+x `up`/`down`/`left`/`right`), imported as clips by the Aseprite importer.
+
+Controller: `Assets/Art/Players/P1/P1.controller`
+
+- Parameters: `MoveX` (float), `MoveY` (float), `IsMoving` (bool)
+- Two 2D Simple Directional blend trees, `Idle` and `Walk`, each with four
+  motions at (0,-1) (0,1) (-1,0) (1,0)
+- Transitions both ways on `IsMoving`, **Has Exit Time off** — leaving it on
+  makes the character finish its cycle before responding, which feels laggy
+
+`Assets/Scripts/PlayerAnimator.cs` drives it:
+
+- `facing` and `isMoving` are **NetworkVariables written by the server**.
+  Every client applies them in `Update`, so *all* players animate — a
+  local-only implementation would leave remote players frozen, because
+  `PlayerMovement.Update` returns early on `!IsOwner`.
+- `facing` only updates while moving, so the character keeps facing the
+  direction it last walked when it stops
+- Velocity snaps to the dominant axis — the art has no diagonals
+
+### Setup gotchas
+
+- Aseprite import must be **Animated Sprite** mode, not Sprite Sheet, or no
+  clips are generated from tags
+- Blend trees default **both** parameter dropdowns to the same value; the
+  second must be set to `MoveY` by hand
+- Generated clips are read-only sub-assets. If Loop Time needs changing,
+  duplicate the clip (Cmd+D) to get an editable standalone `.anim`
+
 ## Caught state
 
 `Assets/Scripts/PlayerState.cs`

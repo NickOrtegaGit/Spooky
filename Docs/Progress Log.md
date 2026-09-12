@@ -75,6 +75,14 @@ clients it sat at origin while the host's patrolled. `NetworkObject`'s
 `SynchronizeTransform` permits transform sync; `NetworkTransform` is what
 actually sends it. **Any networked object that moves needs both.**
 
+## 2026-09-12 (later) — player animation
+
+Four-directional idle/walk, replicated. See [[Player]].
+
+Gotchas: Aseprite needed Animated Sprite import mode; blend tree Y parameter
+silently defaults to the X parameter; Animator params must be driven from
+NetworkVariables or only your own character animates.
+
 ## Next
 
 - [ ] Task objects with networked completion ([[Tasks]])
