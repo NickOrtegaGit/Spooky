@@ -36,8 +36,25 @@ Key details:
 Expected: slight input lag on your own cube. That is the server-authoritative
 design working, not a bug. Client-side prediction would fix it; not needed yet.
 
+## Caught state
+
+`Assets/Scripts/PlayerState.cs`
+
+`NetworkVariable<bool> isCaught`, set server-side by `MonsterCatch` on
+contact. While caught the player is **immobilized** and tinted grey.
+
+Enforced in two places on purpose:
+
+- `Update` — owner stops reading input (avoids pointless RPC traffic)
+- `FixedUpdate` — **server** zeroes velocity regardless. A modified client
+  that ignores its own caught flag still cannot move.
+
+**What being caught leads to is deliberately undecided.** Respawn, spectator,
+and downed-and-revivable all build on this same flag — see the open question
+in [[Monster AI]]. Decide once more mechanics are fleshed out.
+
 ## TODO
 
-- [ ] Spawn points — everyone currently spawns at `0,0,0` and overlaps
+- [x] Spawn points — `SpawnManager`, four points, server-assigned
 - [ ] Real sprite instead of the placeholder square
 - [ ] Interaction range / "use" input for [[Tasks]]

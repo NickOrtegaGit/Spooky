@@ -60,9 +60,24 @@ Gotchas hit:
 - Code-spawned prefabs must be registered in `DefaultNetworkPrefabs.asset`.
   The Player prefab is exempt — `NetworkConfig.PlayerPrefab` covers it.
 
+## 2026-09-12 — caught state
+
+Monster contact now marks players caught and immobilizes them. See
+[[Player]].
+
+Deliberately **not** deciding the real penalty yet — respawn, spectator, and
+revive all build on this same replicated flag, so it is foundation, not a
+placeholder.
+
+Gotcha: the Monster prefab was missing `NetworkTransform`. It replicated its
+*existence* (collider worked, catches fired) but never its *position* — so on
+clients it sat at origin while the host's patrolled. `NetworkObject`'s
+`SynchronizeTransform` permits transform sync; `NetworkTransform` is what
+actually sends it. **Any networked object that moves needs both.**
+
 ## Next
 
-- [ ] Decide what happens when the monster catches a player ([[Monster AI]])
 - [ ] Task objects with networked completion ([[Tasks]])
+- [ ] Decide the real catch penalty once mechanics are fleshed out
 - [ ] Monster patrol -> chase ([[Monster AI]])
 - [ ] Task objects with networked completion ([[Tasks]])

@@ -21,6 +21,7 @@ Tone: scary but silly, not grim.
 - [[Tasks]]
 - [[House Layout]]
 - [[Art Pipeline]]
+- [[Shaders]]
 
 ## Why this project
 
