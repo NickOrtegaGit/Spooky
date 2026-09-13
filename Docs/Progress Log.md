@@ -83,6 +83,24 @@ Gotchas: Aseprite needed Animated Sprite import mode; blend tree Y parameter
 silently defaults to the X parameter; Animator params must be driven from
 NetworkVariables or only your own character animates.
 
+## 2026-09-12 (evening) — tasks + camera
+
+**v1 scope is functionally complete.**
+
+- Task interaction system: proximity highlight, E to interact, replicated
+  completion. See [[Tasks]].
+- `Spooky/SpriteFlash` shader — first real shader in the project. See
+  [[Shaders]].
+- Per-client Cinemachine camera. See [[Player]].
+
+Gotchas:
+
+- NGO refuses NetworkBehaviours on the NetworkManager GameObject — the
+  TaskTracker needed its own object with a NetworkObject.
+- Components were accidentally added to the `Floor` tilemap instead of the
+  typewriter; worth verifying the Inspector header before adding.
+- `SpriteRenderer.color` multiplies, so white tint is a no-op.
+
 ## Next
 
 - [ ] Task objects with networked completion ([[Tasks]])

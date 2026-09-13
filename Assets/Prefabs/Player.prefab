@@ -18,6 +18,8 @@ GameObject:
   - component: {fileID: -6096351467586697157}
   - component: {fileID: 8495798242150698641}
   - component: {fileID: 182397340596835582}
+  - component: {fileID: 964128815728926810}
+  - component: {fileID: 257616422576973591}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -212,7 +214,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   ShowTopMostFoldoutHeaderGroup: 1
-  moveSpeed: 5
+  moveSpeed: 3.5
 --- !u!114 &5908387042792698281
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -309,3 +311,33 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimator
   ShowTopMostFoldoutHeaderGroup: 1
   movingThreshold: 0.05
+--- !u!114 &964128815728926810
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8133863472387211428}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba863385490c04b84a48e644b7406bcc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerInteractor
+  ShowTopMostFoldoutHeaderGroup: 1
+  interactRange: 2
+  interactableLayers:
+    serializedVersion: 2
+    m_Bits: 128
+--- !u!114 &257616422576973591
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8133863472387211428}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a56ca54208cce454ca6bb9793fb7ab61, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerCameraBinder
+  ShowTopMostFoldoutHeaderGroup: 1

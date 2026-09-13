@@ -41,15 +41,15 @@ Safer default: host generates, then sends the resulting layout data. Sharing
 only the seed requires the generation code to be perfectly deterministic
 across machines, which is easy to get subtly wrong.
 
-## Hard constraint: rooms must read as rooms
+## Note: task objects need to be findable, not fixed
 
-[[Gameplay Loop]] has players finding tasks by **inferring location from
-description** — "cook something" means find the kitchen. That only works if
-a kitchen looks like a kitchen.
+[[Gameplay Loop]] has players finding tasks by exploring rather than
+following a waypoint. That does **not** mean every object has a fixed home —
+a computer could be in any of several rooms, and searching for it is the
+point.
 
-This constrains v3 procedural generation more than it first appears: rooms
-cannot be randomly furnished. Generation has to place *coherent* rooms, or
-the core exploration mechanic breaks.
+Procedural generation is a v3 stretch goal and explicitly **not a priority**.
+If it happens, good; if not, hand-built layouts are fine.
 
 ## Feeds into
 

@@ -69,11 +69,11 @@ Fix: `PatrolRoute` is a scene singleton the monster looks up in
 
 Watch for this with any prefab that needs scene data.
 
-## Planned: noise attraction
+## Possible: noise attraction
 
-Per [[Gameplay Loop]], doing a task makes noise and draws the monster. This
-is the mechanic that couples the monster to the task loop — without it the
-two systems run in parallel and never create tension.
+**Not decided.** One candidate for coupling the monster to the task loop, so
+the two systems create tension instead of running in parallel. Would need an
+`Investigate` state — moving toward a position without having seen a player.
 
 Undecided: noise radius, whether task types differ in loudness, whether
 failure is louder. Likely a third state (**Investigate**) that moves toward a

@@ -62,8 +62,8 @@ This is what makes the loop tense rather than parallel: you are not just
 avoiding the monster while doing tasks, **the tasks are what summon it.**
 Speed becomes a real tradeoff against safety.
 
-Exact mechanic undecided — noise radius, noise per task type, whether
-different tasks are louder. See [[Monster AI]].
+**Not decided whether noise is used at all.** It is one option for coupling
+the monster to the task loop, not a commitment. See [[Monster AI]].
 
 ## Escaping a chase — later
 

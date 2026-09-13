@@ -2,6 +2,29 @@
 
 Not yet built. Planned for v1 — see [[Scope Plan]].
 
+## Built
+
+`Assets/Scripts/Tasks/`
+
+- **`Interactable`** — base class. Proximity highlight via a
+  `MaterialPropertyBlock` driving the `Spooky/SpriteFlash` shader.
+  `Interact()` is virtual; minigames override it.
+- **`TaskObject : Interactable`** — completion in a `NetworkVariable<bool>`,
+  set server-side. v1 completes instantly; a minigame replaces that.
+- **`PlayerInteractor`** — owner-side `OverlapCircleAll` on the
+  `Interactable` layer, E to interact. **The server re-checks range** in the
+  RPC, so a client cannot claim to use a task across the map.
+- **`TaskTracker`** — counts completions, replicated. Needs its **own**
+  GameObject with a NetworkObject: NGO forbids NetworkBehaviours on the
+  NetworkManager object.
+
+### Why the highlight needed a shader
+
+`SpriteRenderer.color` **multiplies** the texture, so setting it white
+changes nothing (`white x art = art`). Making a sprite fully white requires
+replacing RGB, not tinting — hence `Assets/Art/Shaders/SpriteFlash.shader`.
+See [[Shaders]].
+
 ## v1 requirements
 
 Small **fixed** task list. Randomization is v3, after procedural generation.

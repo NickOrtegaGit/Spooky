@@ -68,6 +68,23 @@ Controller: `Assets/Art/Players/P1/P1.controller`
 - Generated clips are read-only sub-assets. If Loop Time needs changing,
   duplicate the clip (Cmd+D) to get an editable standalone `.anim`
 
+## Camera
+
+Cinemachine 3.1.7. **Deliberately not networked** — every client runs its own
+camera, and where you look is not game state.
+
+`PlayerCameraBinder` runs on each client: the locally-owned player
+(`IsOwner`) assigns itself as the `CinemachineCamera`'s Follow target in
+`OnNetworkSpawn`. Host and client each follow their own character.
+
+- Position Composer with damping ~0.5 on X and Y
+- `ForceCameraPosition` on spawn so it does not glide in from origin
+- The blue box and yellow dot in the Editor are Cinemachine gizmos — editor
+  only, never in a build. Toggle them in the Game view's Gizmos dropdown.
+
+TODO: `CinemachineConfiner2D` once the house is bigger, to stop the camera
+showing the void past the walls.
+
 ## Caught state
 
 `Assets/Scripts/PlayerState.cs`
