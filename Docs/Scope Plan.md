@@ -11,10 +11,13 @@ Build in this order. Do not skip ahead.
 
 Status: see [[Progress Log]]
 
-## v2 — internet play
+## v2 — internet play (Relay done)
 
-Add Unity Relay + Lobby so players connect over the actual internet with a
-join code, instead of local network only.
+Unity Relay working: host gets a join code, clients connect with it, no port
+forwarding. See [[Networking]].
+
+Lobby is installed but not yet used. Still needs a real menu, and testing
+across two physical machines.
 
 Only affects *how players connect*, not how gameplay runs once connected —
 which is why it is safe to defer. See [[Architecture]].

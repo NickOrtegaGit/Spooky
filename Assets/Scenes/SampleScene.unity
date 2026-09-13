@@ -2223,8 +2223,9 @@ GameObject:
   - component: {fileID: 710181229}
   - component: {fileID: 710181228}
   - component: {fileID: 710181227}
-  - component: {fileID: 710181230}
   - component: {fileID: 710181231}
+  - component: {fileID: 710181233}
+  - component: {fileID: 710181232}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -2320,18 +2321,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &710181230
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 710181226}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9148c31e6783441c5af0ccbedec42e5e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::NetworkHUD
 --- !u!114 &710181231
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2346,6 +2335,31 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MonsterSpawner
   monsterPrefab: {fileID: 7187379068760435509, guid: f50ba1f17e07242a592231568369e733, type: 3}
   spawnPoint: {fileID: 137186486}
+--- !u!114 &710181232
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 710181226}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc34ad86bb8f04a0fbca5676a249e98e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RelayHUD
+--- !u!114 &710181233
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 710181226}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f13f7d06c92ad4c8fadcd6f52190567a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RelayConnectionManager
+  maxPlayers: 4
 --- !u!1 &981156098
 GameObject:
   m_ObjectHideFlags: 0

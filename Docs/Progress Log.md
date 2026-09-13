@@ -101,6 +101,15 @@ Gotchas:
   typewriter; worth verifying the Inspector header before adding.
 - `SpriteRenderer.color` multiplies, so white tint is a no-op.
 
+## 2026-09-12 (late) — Relay working
+
+**v2 milestone.** Host creates a join code, client connects through Unity
+Relay. Verified: allocation created, code issued, zero exceptions, nothing
+bound to local 7777 — traffic really is going through Relay.
+
+Built WebSocket-ready so the v4 browser target needs no rework. See
+[[Networking]] for the package gotchas, which were the hard part.
+
 ## Next
 
 - [ ] Task objects with networked completion ([[Tasks]])

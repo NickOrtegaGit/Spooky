@@ -32,7 +32,47 @@ lsof -nP -iUDP:7777
 
 Always fully quit the build before rebuilding or restarting a host.
 
-## v2 — Relay + Lobby
+## v2 — Relay (built)
 
-Replaces direct IP connection with a join code. Does not change gameplay
-logic. See [[Scope Plan]].
+`Assets/Scripts/Networking/RelayConnectionManager.cs`
+
+Host creates a Relay allocation and gets a 6-character join code; clients
+join with that code. No port forwarding, works across the internet.
+
+Flow: `UnityServices.InitializeAsync()` -> `SignInAnonymouslyAsync()` ->
+`CreateAllocationAsync(maxPlayers - 1)` -> `GetJoinCodeAsync()` ->
+`SetRelayServerData()` -> `StartHost()`.
+
+### WebSocket-ready from the start
+
+```csharp
+#if UNITY_WEBGL && !UNITY_EDITOR
+    const string ConnectionType = "wss";   // browsers cannot do raw UDP
+#else
+    const string ConnectionType = "dtls";  // encrypted UDP, lower latency
+#endif
+```
+
+A WebGL page served over HTTPS is **not allowed** to open an insecure
+connection, so `wss` is mandatory for v4, not optional. Building this in now
+means the browser target needs no connection-layer rework.
+
+### Package gotchas (Unity 6)
+
+- The standalone `com.unity.services.relay` / `com.unity.services.lobby`
+  packages are **deprecated**. Use `com.unity.services.multiplayer` — having
+  both installed is a hard conflict.
+- The unified package defines its own `Allocation` types, so
+  `new RelayServerData(allocation, type)` does **not** compile. Use the
+  extension method: `allocation.ToRelayServerData(connectionType)`.
+- `CreateAllocationAsync(maxPlayers - 1)` — the host does not consume a
+  Relay connection slot.
+- Relay and Lobby must be **enabled in the Unity Cloud dashboard**, or calls
+  fail at runtime with an authorization error.
+
+### Still to do
+
+- Lobby (player list, names, ready state) — package installed, not used yet
+- A real menu; `RelayHUD` is throwaway OnGUI
+- **Test across two machines** — local host+client proves the code path, not
+  that it traverses networks
