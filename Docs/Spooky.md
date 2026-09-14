@@ -23,6 +23,7 @@ Tone: scary but silly, not grim.
 - [[Player]]
 - [[Monster AI]]
 - [[Tasks]]
+- [[Items]]
 - [[House Layout]]
 - [[Art Pipeline]]
 - [[Shaders]]

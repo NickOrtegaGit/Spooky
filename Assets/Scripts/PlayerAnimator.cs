@@ -24,6 +24,10 @@ public class PlayerAnimator : NetworkBehaviour
     private Animator animator;
     private Rigidbody2D rb;
 
+    /// <summary>Replicated facing direction, for anything that needs to know
+    /// which way the player is pointing (item drops, future item use).</summary>
+    public Vector2 Facing => facing.Value;
+
     private void Awake()
     {
         animator = GetComponent<Animator>();

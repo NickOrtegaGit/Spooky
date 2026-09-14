@@ -40,6 +40,9 @@ public class PlayerState : NetworkBehaviour
     {
         if (!IsServer) return;
         isCaught.Value = caught;
+
+        // A caught player drops what they were carrying.
+        if (caught) GetComponent<PlayerItemSlot>()?.ServerDropAll();
     }
 
     private void OnCaughtChanged(bool previous, bool current) => ApplyTint(current);
