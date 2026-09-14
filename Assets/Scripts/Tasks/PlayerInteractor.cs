@@ -13,12 +13,14 @@ public class PlayerInteractor : NetworkBehaviour
 
     private Interactable current;
     private PlayerState state;
+    private InteractPrompt prompt;
 
     public Interactable Current => current;
 
     private void Awake()
     {
         state = GetComponent<PlayerState>();
+        prompt = GetComponentInChildren<InteractPrompt>(true);
     }
 
     private void Update()
@@ -28,14 +30,18 @@ public class PlayerInteractor : NetworkBehaviour
         if (state != null && state.IsCaught)
         {
             SetCurrent(null);
+            if (prompt != null) prompt.SetInRange(false);
             return;
         }
 
         SetCurrent(FindNearest());
 
+        if (prompt != null) prompt.SetInRange(current != null);
+
         if (current != null && Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
         {
             InteractServerRpc(current.NetworkObjectId);
+            if (prompt != null) prompt.SuppressAfterInteract();
         }
     }
 

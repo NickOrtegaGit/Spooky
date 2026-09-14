@@ -74,5 +74,5 @@ means the browser target needs no connection-layer rework.
 
 - Lobby (player list, names, ready state) — package installed, not used yet
 - A real menu; `RelayHUD` is throwaway OnGUI
-- **Test across two machines** — local host+client proves the code path, not
-  that it traverses networks
+- ~~Test across two machines~~ — **done 2026-09-13, worked first try.**
+  Two Macs on different networks, connected by join code, no port forwarding.

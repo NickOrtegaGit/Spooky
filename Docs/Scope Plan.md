@@ -11,13 +11,14 @@ Build in this order. Do not skip ahead.
 
 Status: see [[Progress Log]]
 
-## v2 — internet play (Relay done)
+## v2 — internet play (Relay verified)
 
-Unity Relay working: host gets a join code, clients connect with it, no port
+**Working and tested across two machines on different networks
+(2026-09-13).** Host gets a join code, clients connect with it, no port
 forwarding. See [[Networking]].
 
-Lobby is installed but not yet used. Still needs a real menu, and testing
-across two physical machines.
+Remaining: Lobby (installed, unused) and a real menu to replace the throwaway
+OnGUI HUD.
 
 Only affects *how players connect*, not how gameplay runs once connected —
 which is why it is safe to defer. See [[Architecture]].

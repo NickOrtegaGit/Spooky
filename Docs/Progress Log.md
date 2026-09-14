@@ -110,6 +110,17 @@ bound to local 7777 — traffic really is going through Relay.
 Built WebSocket-ready so the v4 browser target needs no rework. See
 [[Networking]] for the package gotchas, which were the hard part.
 
+## 2026-09-13 — Relay verified across machines
+
+Sent a zipped Mac build to a second machine on a different network. Host
+created a code, client joined, **worked first try.**
+
+v2's core claim is now real: *playable over the internet with a join code.*
+
+Distribution notes: zip with `ditto -c -k --sequesterRsrc --keepParent` (the
+Finder's Compress can break the .app bundle). The build is unsigned, so the
+recipient must **right-click -> Open**, not double-click.
+
 ## Next
 
 - [ ] Task objects with networked completion ([[Tasks]])
