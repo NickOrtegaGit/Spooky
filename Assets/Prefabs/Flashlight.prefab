@@ -85,7 +85,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 110
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -788550342201689668, guid: 09dd4e5d19f1e445ea7edaf385db7b7d, type: 3}
+  m_Sprite: {fileID: -1525341083918521751, guid: 703e791073ec7453fbf9fa2c45a1d07e, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -160,7 +160,7 @@ MonoBehaviour:
   Ownership: 1
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
-  m_InScenePlaced: 1
+  m_InScenePlaced: 0
   ActiveSceneSynchronization: 0
   SceneMigrationSynchronization: 0
   SpawnWithObservers: 1
@@ -186,7 +186,21 @@ MonoBehaviour:
   highlightStrength: 1
   itemName: Item
   heldOffset: {x: 0.3, y: 0, z: 0}
+  itemSprite: {fileID: 5244183872910804356}
+  groundSprite: {fileID: -1525341083918521751, guid: 703e791073ec7453fbf9fa2c45a1d07e, type: 3}
+  heldSprite: {fileID: -2778408283522584184, guid: 703e791073ec7453fbf9fa2c45a1d07e, type: 3}
   beam: {fileID: 1553251116465703673}
+  beamTurnSpeed: 720
+  heldUp: {fileID: -2836219022857091165, guid: 64698ec0d6e66486391ff78ff96daad3, type: 3}
+  heldDown: {fileID: 3448144074706004273, guid: 64698ec0d6e66486391ff78ff96daad3, type: 3}
+  heldLeft: {fileID: -9027497043174511763, guid: 64698ec0d6e66486391ff78ff96daad3, type: 3}
+  heldRight: {fileID: -3107431761585894060, guid: 64698ec0d6e66486391ff78ff96daad3, type: 3}
+  offsetUp: {x: 0.2, y: 1.5}
+  offsetDown: {x: 0.2, y: -1}
+  offsetLeft: {x: -1, y: 0.5}
+  offsetRight: {x: 1, y: 0.5}
+  orderInFrontOfPlayer: 105
+  orderBehindPlayer: 95
 --- !u!1 &7890455556658010922
 GameObject:
   m_ObjectHideFlags: 0
@@ -251,12 +265,12 @@ MonoBehaviour:
   m_ShadowsEnabled: 1
   m_ShadowIntensity: 0.75
   m_ShadowSoftness: 0.3
-  m_ShadowSoftnessFalloffIntensity: 0.5
+  m_ShadowSoftnessFalloffIntensity: 0.1
   m_ShadowVolumeIntensityEnabled: 0
   m_ShadowVolumeIntensity: 0.75
   m_LocalBounds:
-    m_Center: {x: 5.24975, y: 0.0012499094, z: 0}
-    m_Extent: {x: 5.25045, y: 3.4995499, z: 0}
+    m_Center: {x: 4.24975, y: 0.00084996223, z: 0}
+    m_Extent: {x: 4.25045, y: 5.4999504, z: 0}
   m_PointLightInnerAngle: 360
   m_PointLightOuterAngle: 360
   m_PointLightInnerRadius: 2
@@ -267,7 +281,7 @@ MonoBehaviour:
   m_ShapeLightFalloffSize: 0.5
   m_ShapeLightFalloffOffset: {x: 0, y: 0}
   m_ShapePath:
-  - {x: 0.5, y: -0.5, z: 0}
-  - {x: 10, y: -3, z: 0}
-  - {x: 10, y: 3, z: 0}
-  - {x: 0.5, y: 0.5, z: 0}
+  - {x: 0.5, y: -0.2, z: 0}
+  - {x: 8, y: -5, z: 0}
+  - {x: 8, y: 5, z: 0}
+  - {x: 0.5, y: 0.2, z: 0}

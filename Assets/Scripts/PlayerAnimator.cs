@@ -51,11 +51,14 @@ public class PlayerAnimator : NetworkBehaviour
 
         isMoving.Value = moving;
 
-        if (!moving) return;
+        // Facing itself is set by the owning client via ServerSetFacing —
+        // only the client knows which key was pressed first.
+    }
 
-        // Snap to the dominant axis: 4-directional art has no diagonals.
-        facing.Value = Mathf.Abs(velocity.x) > Mathf.Abs(velocity.y)
-            ? new Vector2(Mathf.Sign(velocity.x), 0f)
-            : new Vector2(0f, Mathf.Sign(velocity.y));
+    /// <summary>Server only. Called from PlayerMovement's input RPC.</summary>
+    public void ServerSetFacing(Vector2 value)
+    {
+        if (!IsServer || value == Vector2.zero) return;
+        facing.Value = value;
     }
 }

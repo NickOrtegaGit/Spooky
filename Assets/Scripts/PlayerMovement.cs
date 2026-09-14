@@ -9,12 +9,20 @@ public class PlayerMovement : NetworkBehaviour
 
     private Rigidbody2D rb;
     private PlayerState state;
+    private PlayerAnimator playerAnimator;
     private Vector2 inputDirection;
+
+    // Facing is decided on the owning client, where key press order is known.
+    // First axis held wins and keeps winning until that key is released, so
+    // the character does not flip direction mid-diagonal.
+    private Vector2 facingIntent = Vector2.down;
+    private bool horizontalHeldFirst;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         state = GetComponent<PlayerState>();
+        playerAnimator = GetComponent<PlayerAnimator>();
     }
 
     public override void OnNetworkSpawn()
@@ -46,17 +54,42 @@ public class PlayerMovement : NetworkBehaviour
 
         Vector2 newInput = new Vector2(x, y).normalized;
 
+        UpdateFacingIntent(x, y);
+
         if (newInput != inputDirection)
         {
             inputDirection = newInput;
-            SubmitInputServerRpc(inputDirection);
+            SubmitInputServerRpc(inputDirection, facingIntent);
+        }
+        else if (playerAnimator != null && playerAnimator.Facing != facingIntent && facingIntent != Vector2.zero)
+        {
+            SubmitInputServerRpc(inputDirection, facingIntent);
         }
     }
 
+    private void UpdateFacingIntent(float x, float y)
+    {
+        bool horizontal = Mathf.Abs(x) > 0.01f;
+        bool vertical = Mathf.Abs(y) > 0.01f;
+
+        if (!horizontal && !vertical) return;   // keep the last facing when idle
+
+        // Whichever axis started first stays in charge until it is released.
+        if (horizontal && !vertical) horizontalHeldFirst = true;
+        else if (vertical && !horizontal) horizontalHeldFirst = false;
+
+        bool useHorizontal = horizontalHeldFirst ? horizontal : !vertical;
+
+        facingIntent = useHorizontal
+            ? new Vector2(Mathf.Sign(x), 0f)
+            : new Vector2(0f, Mathf.Sign(y));
+    }
+
     [Rpc(SendTo.Server)]
-    private void SubmitInputServerRpc(Vector2 direction)
+    private void SubmitInputServerRpc(Vector2 direction, Vector2 facing)
     {
         inputDirection = direction;
+        if (playerAnimator != null) playerAnimator.ServerSetFacing(facing);
     }
 
     private void FixedUpdate()

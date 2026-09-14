@@ -10,6 +10,11 @@ public class CarryableItem : Interactable
     [SerializeField] private string itemName = "Item";
     [SerializeField] private Vector3 heldOffset = new Vector3(0.3f, 0f, 0f);
 
+    [Header("Sprites")]
+    [SerializeField] private SpriteRenderer itemSprite;
+    [SerializeField] private Sprite groundSprite;
+    [SerializeField] private Sprite heldSprite;
+
     // ulong.MaxValue means "on the ground". Replicated so every client draws
     // the item in the right hands.
     private readonly NetworkVariable<ulong> holderClientId =
@@ -26,7 +31,11 @@ public class CarryableItem : Interactable
     {
         base.Awake();
         itemCollider = GetComponent<Collider2D>();
+        if (itemSprite == null) itemSprite = GetComponent<SpriteRenderer>();
     }
+
+    /// <summary>Exposed so subclasses can drive flipping and sort order.</summary>
+    public SpriteRenderer ItemSprite => itemSprite;
 
     public override void OnNetworkSpawn()
     {
@@ -82,6 +91,14 @@ public class CarryableItem : Interactable
 
         // A held item must not be detected as a pickup target by anyone.
         if (itemCollider != null) itemCollider.enabled = !held;
+
+        // Ground and held sprites are usually drawn at different angles.
+        if (itemSprite != null)
+        {
+            Sprite wanted = held ? heldSprite : groundSprite;
+            if (wanted != null) itemSprite.sprite = wanted;
+            if (!held) itemSprite.flipX = false;
+        }
 
         if (held)
         {
