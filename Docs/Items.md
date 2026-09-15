@@ -1,6 +1,7 @@
 # Items
 
-Things the player picks up, carries, and uses. **Not built yet.**
+Things the player picks up, carries, and uses. **Built** — see the flashlight
+below.
 
 Items are deliberately **simple**. They are not an inventory system — they are
 one object in one slot with one action.
@@ -25,6 +26,49 @@ one object in one slot with one action.
 | `Space` | Use |
 
 All three are placeholders until there is a real input map.
+
+## Built
+
+`Assets/Scripts/Items/`
+
+- **`CarryableItem : Interactable`** — holder in a `NetworkVariable<ulong>`
+  (`ulong.MaxValue` = on the ground). Swaps between a **ground sprite** and a
+  **held sprite**, disables its collider while held so it cannot be picked up
+  twice, and exposes an `OnHeldStateChanged` hook for per-item behavior.
+- **`PlayerItemSlot`** — the single slot. Q drops, Space uses. Swap-on-pickup
+  happens in one server-side call so no frame sees an empty hand.
+- **`Flashlight : CarryableItem`** — the first real item.
+- **`FlashlightAim`** — on the player; 360-degree mouse aim.
+- **`PlayerLightControl`** — the player's light bubble, with counted
+  suppressors so multiple sources can dim it without fighting.
+
+### Drawback: the flashlight blinds you
+
+Holding the flashlight **suppresses the player's own light bubble** — on or
+off. Carrying it unlit is strictly worse than empty-handed, and that is
+intended: picking it up is a commitment, and dropping it is a real decision.
+
+This is the pattern for every item. Each gets a `CarryableItem` subclass and
+implements its drawback in `OnHeldStateChanged`.
+
+### Aim: mouse, not WASD
+
+The beam aims freely at the mouse while the **body stays four-directional**.
+
+Four-direction facing was tried first and felt janky — moving diagonally
+flipped the beam depending on which axis was larger. First-axis-wins logic
+fixed the worst of it (and still drives the body), but free aim removed the
+problem instead of managing it. It also plays better: you can back away from
+something while keeping it lit.
+
+Networking: the owning client computes the angle from **its own camera**,
+sends it throttled (20 Hz, 2-degree threshold — a mouse moves every frame and
+does not need replicating that often), and the server writes it to a
+`NetworkVariable<float>`. Remote clients interpolate with
+`MoveTowardsAngle`, so it looks smooth between updates.
+
+The item sprite still snaps to the nearest of four drawn angles, each with
+its own hand offset, so it reads as staying in the same hand.
 
 ## Worked example: the flashlight
 

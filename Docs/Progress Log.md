@@ -121,6 +121,24 @@ Distribution notes: zip with `ditto -c -k --sequesterRsrc --keepParent` (the
 Finder's Compress can break the .app bundle). The build is unsigned, so the
 recipient must **right-click -> Open**, not double-click.
 
+## 2026-09-14 — lighting, prompts, items
+
+- **Player lighting.** Global Light 2D down to ~0.08, Point Light 2D on the
+  player. The darkness mechanic that defines the look. See [[Shaders]].
+- **Interact prompt** above the player's head, fading in and out, unlit so it
+  stays readable in the dark.
+- **Full item system** with the flashlight as the first item. See [[Items]].
+
+Gotchas:
+
+- Unity's `Light` and `Light 2D` are different components; a 3D Point Light
+  does nothing to 2D sprites.
+- A light's `Target Sorting Layers` is per-light, not per-object — excluding
+  characters to stop the beam backlighting the holder would also stop it
+  lighting *other* players and the monster. Wrong trade.
+- Anything meant to be read rather than seen in the world (prompts, future
+  HUD) should use an **unlit** material so lighting cannot dim it.
+
 ## Next
 
 - [ ] Task objects with networked completion ([[Tasks]])

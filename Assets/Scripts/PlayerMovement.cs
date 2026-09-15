@@ -42,6 +42,17 @@ public class PlayerMovement : NetworkBehaviour
         if (!IsOwner) return;
         if (state != null && state.IsCaught) return;
 
+        // Committed while doing a task — that is the vulnerability.
+        if (MinigameRunner.Instance != null && MinigameRunner.Instance.IsBusy)
+        {
+            if (inputDirection != Vector2.zero)
+            {
+                inputDirection = Vector2.zero;
+                SubmitInputServerRpc(inputDirection, facingIntent);
+            }
+            return;
+        }
+
         var keyboard = Keyboard.current;
         if (keyboard == null) return;
 

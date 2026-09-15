@@ -11,19 +11,9 @@ public class Flashlight : CarryableItem
     [SerializeField] private Light2D beam;
     [SerializeField] private float beamTurnSpeed = 720f;
 
-    [Header("Held sprites — one per direction")]
-    [SerializeField] private Sprite heldUp;
-    [SerializeField] private Sprite heldDown;
-    [SerializeField] private Sprite heldLeft;
-    [SerializeField] private Sprite heldRight;
-
-    [Header("Held offsets — where the hand is for each facing")]
-    [SerializeField] private Vector2 offsetUp = new Vector2(-0.2f, 0.1f);
-    [SerializeField] private Vector2 offsetDown = new Vector2(0.2f, -0.1f);
-    [SerializeField] private Vector2 offsetLeft = new Vector2(-0.25f, 0f);
-    [SerializeField] private Vector2 offsetRight = new Vector2(0.25f, 0f);
-
-    [Header("Sorting")]
+    [Header("Held orbit")]
+    [Tooltip("Distance from the player's centre that the flashlight orbits at.")]
+    [SerializeField] private float orbitRadius = 0.35f;
     [SerializeField] private int orderInFrontOfPlayer = 105;
     [SerializeField] private int orderBehindPlayer = 95;
 
@@ -42,6 +32,13 @@ public class Flashlight : CarryableItem
     /// <summary>Held state changed — the beam only shows while carried.</summary>
     protected override void OnHeldStateChanged(bool held)
     {
+        // Picking it up switches it on; carrying it unlit is a trap state.
+        if (held && IsServer)
+        {
+            isOn.Value = true;
+            SeedAimFromHolderFacing();
+        }
+
         ApplyBeam(isOn.Value);
         ApplyLightSuppression(held);
     }
@@ -123,6 +120,23 @@ public class Flashlight : CarryableItem
         ApplySpriteForAim(targetAngle);
     }
 
+    /// <summary>
+    /// Start the beam pointing where the player is already facing, rather
+    /// than snapping to wherever the mouse happens to sit.
+    /// </summary>
+    private void SeedAimFromHolderFacing()
+    {
+        if (NetworkManager.Singleton == null) return;
+        if (!NetworkManager.Singleton.ConnectedClients.TryGetValue(HolderClientId, out var client)) return;
+        if (client.PlayerObject == null) return;
+
+        var animator = client.PlayerObject.GetComponent<PlayerAnimator>();
+        var aim = client.PlayerObject.GetComponent<FlashlightAim>();
+        if (animator == null || aim == null) return;
+
+        aim.ServerSetAimFromDirection(animator.Facing);
+    }
+
     private FlashlightAim FindHolderAim()
     {
         if (NetworkManager.Singleton == null) return null;
@@ -132,43 +146,26 @@ public class Flashlight : CarryableItem
     }
 
     /// <summary>
-    /// The body is still four-directional, so pick the nearest of four held
-    /// sprites to the free aim angle, and orbit the item around the player.
+    /// One right-facing sprite, orbited around the player and rotated to the
+    /// aim angle. No snapping, so turning is continuous.
     /// </summary>
     private void ApplySpriteForAim(float angle)
     {
         var itemSprite = ItemSprite;
         if (itemSprite == null) return;
 
+        float radians = angle * Mathf.Deg2Rad;
+        Vector3 orbit = new Vector3(Mathf.Cos(radians), Mathf.Sin(radians), 0f) * orbitRadius;
+
+        itemSprite.transform.localPosition = orbit;
+        itemSprite.transform.localRotation = Quaternion.Euler(0f, 0f, angle);
+
+        // Behind the body while aiming away from the camera.
         float wrapped = Mathf.Repeat(angle, 360f);
-
-        bool aimRight = wrapped < 45f || wrapped >= 315f;
-        bool aimUp = wrapped >= 45f && wrapped < 135f;
-        bool aimLeft = wrapped >= 135f && wrapped < 225f;
-
-        Sprite wanted =
-            aimRight ? heldRight :
-            aimUp ? heldUp :
-            aimLeft ? heldLeft :
-            heldDown;
-
-        if (wanted != null) itemSprite.sprite = wanted;
-
-        Vector2 offset =
-            aimRight ? offsetRight :
-            aimUp ? offsetUp :
-            aimLeft ? offsetLeft :
-            offsetDown;
-
-        itemSprite.transform.localPosition = offset;
-
-        // Behind the body when aiming away from the camera or across it.
-        itemSprite.sortingOrder = (aimLeft || aimUp)
-            ? orderBehindPlayer
-            : orderInFrontOfPlayer;
+        bool aimingUp = wrapped > 20f && wrapped < 160f;
+        itemSprite.sortingOrder = aimingUp ? orderBehindPlayer : orderInFrontOfPlayer;
 
         itemSprite.flipX = false;
-        itemSprite.transform.localRotation = Quaternion.identity;
     }
 
     private void OnToggled(bool previous, bool current) => ApplyBeam(current);

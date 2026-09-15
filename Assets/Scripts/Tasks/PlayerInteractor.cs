@@ -27,7 +27,9 @@ public class PlayerInteractor : NetworkBehaviour
     {
         if (!IsOwner) return;
 
-        if (state != null && state.IsCaught)
+        bool busy = MinigameRunner.Instance != null && MinigameRunner.Instance.IsBusy;
+
+        if ((state != null && state.IsCaught) || busy)
         {
             SetCurrent(null);
             if (prompt != null) prompt.SetInRange(false);

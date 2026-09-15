@@ -43,6 +43,19 @@ public class PlayerState : NetworkBehaviour
 
         // A caught player drops what they were carrying.
         if (caught) GetComponent<PlayerItemSlot>()?.ServerDropAll();
+
+        // ...and is kicked out of any task they were doing.
+        if (caught) ForceExitMinigameRpc(RpcTarget.Single(OwnerClientId, RpcTargetUse.Temp));
+    }
+
+    /// <summary>Runs on the caught player's own client.</summary>
+    [Rpc(SendTo.SpecifiedInParams)]
+    private void ForceExitMinigameRpc(RpcParams rpcParams)
+    {
+        if (MinigameRunner.Instance != null && MinigameRunner.Instance.IsBusy)
+        {
+            MinigameRunner.Instance.ForceExit();
+        }
     }
 
     private void OnCaughtChanged(bool previous, bool current) => ApplyTint(current);

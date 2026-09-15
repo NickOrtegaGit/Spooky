@@ -36,6 +36,32 @@ Each task needs:
 - Server-authoritative validation — the host decides a task is complete, not
   the client claiming it
 
+## Task schema
+
+Every task (except hypothetical fetch quests) starts the same way:
+
+1. Player enters interact range
+2. The object highlights (`Spooky/SpriteFlash`)
+3. "Press E" prompt appears above the player's head
+4. E starts the task
+
+So a task is: **a GameObject with a sprite, a collider, a NetworkObject, and
+a `TaskObject` subclass.** What differs between tasks is only what happens
+after E — the minigame itself.
+
+### The minigame is local
+
+A minigame runs **entirely on the client doing it**. Only three things cross
+the network:
+
+- **start** — so the server knows this task is occupied
+- **fail** — returns to normal play, task stays incomplete
+- **complete** — server marks the task done, replicated to everyone
+
+Keystrokes, progress, and UI state never replicate. This keeps minigames
+cheap to write and means a new one needs no networking work beyond calling
+those three.
+
 ## Settled design
 
 See [[Gameplay Loop]] for the full round.
@@ -52,9 +78,9 @@ See [[Gameplay Loop]] for the full round.
 
 ### Reference minigame: the typewriter
 
-A letter is pre-written; the player types it out. One mistake restarts it,
-because a typewriter cannot backspace. Build this one first — it sets the
-tone for what a "task" means here.
+See [[Typewriter]] for the full spec. It sets the tone for what a "task"
+means here: slow, silly, and punishing enough that the monster arriving
+matters.
 
 ## Open questions
 

@@ -27,6 +27,7 @@ public class PlayerItemSlot : NetworkBehaviour
     {
         if (!IsOwner) return;
         if (state != null && state.IsCaught) return;
+        if (MinigameRunner.Instance != null && MinigameRunner.Instance.IsBusy) return;
 
         var keyboard = Keyboard.current;
         if (keyboard == null) return;
