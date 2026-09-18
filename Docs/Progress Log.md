@@ -139,9 +139,35 @@ Gotchas:
 - Anything meant to be read rather than seen in the world (prompts, future
   HUD) should use an **unlit** material so lighting cannot dim it.
 
+## 2026-09-17 — the task panel
+
+**Verified working.** Interacting with a task slides a panel up over the
+world; the placeholder completes after 5 uninterrupted seconds, X backs out,
+and the monster catching you drops the panel and frees the task.
+
+The panel is the FNAF camera-flip: it covers the screen, you are committed
+while it is up, and every task will share that framing. See [[Tasks]].
+
+- `PanelMinigame` — shared overlay fade + slide, `InputReady` gate, and an
+  `EndSequence(bool)` hook for per-minigame flourishes
+- `PanelTaskMinigame` — the placeholder: visible countdown, X to leave
+- `MinigameRunner` — scene singleton holding the one active minigame
+
+Notes:
+
+- The caught-player interrupt needed **no new code**. `PlayerState.SetCaught`
+  already RPC'd the caught client to call `MinigameRunner.ForceExit()`;
+  `OnEnd()` just has to stop the timer.
+- `PanelMinigame` hides the panel at `shown + (0, -Screen.height)` — pixels,
+  while `anchoredPosition` is in Canvas Scaler reference units. Correct at
+  1080p, off elsewhere. Not yet hit in practice.
+- TextMeshPro ships inside `com.unity.ugui` in Unity 6; no separate package.
+
 ## Next
 
-- [ ] Task objects with networked completion ([[Tasks]])
+- [ ] Real minigames on the panel, starting with the typewriter
+      ([[Typewriter]])
 - [ ] Decide the real catch penalty once mechanics are fleshed out
-- [ ] Monster patrol -> chase ([[Monster AI]])
-- [ ] Task objects with networked completion ([[Tasks]])
+- [ ] Free a task when its occupant **disconnects** mid-minigame — hook
+      `ServerReleaseIfOccupiedBy` to `OnClientDisconnectCallback` ([[Tasks]])
+- [ ] Replace the OnGUI HUD with a real menu; wire up Lobby ([[Networking]])

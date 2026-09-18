@@ -1,7 +1,9 @@
 # Typewriter
 
 The first real minigame, and the reference for what a task feels like. **Not
-built yet.**
+built yet** — but the framework under it is. It subclasses `PanelMinigame`,
+which already supplies the overlay, the slide-up panel, and the
+`EndSequence(bool)` hook the failure shake goes in. See [[Tasks]].
 
 ## The loop
 
@@ -43,15 +45,18 @@ the paper, the typing, the shake — none of it replicates.
 
 Three things cross the wire: **start**, **fail**, **complete**.
 
-Implications to handle:
+All three are implemented — see [[Tasks]]. The typewriter inherits them and
+needs no networking work of its own.
+
+Implications, all handled:
 
 - While one player is typing, others see them standing still at the
   typewriter. That is correct — and it is what makes a teammate watching for
   the monster valuable.
-- A player caught mid-task should be **kicked out of the minigame**. See
-  [[Player]].
-- The task must be locked while occupied so two players cannot type the same
-  passage at once.
+- A player caught mid-task is **kicked out of the minigame** — `SetCaught`
+  drives `MinigameRunner.ForceExit()`. See [[Player]].
+- The task is locked while occupied (`occupantClientId`), so two players
+  cannot type the same passage at once.
 
 ## Open questions
 
