@@ -1,6 +1,38 @@
 # Shaders
 
-Notes for making Spooky look good. Nothing here is built yet.
+Notes for making Spooky look good.
+
+## Built
+
+Shaders live in `Assets/Shaders/`.
+
+- **`Spooky/SpriteFlash`** — replaces a sprite's RGB while keeping its alpha,
+  for the interact highlight. `SpriteRenderer.color` multiplies, so white
+  tint is a no-op; this is why a shader was needed. See [[Tasks]].
+- **`Spooky/VhsDistortion`** — fullscreen cassette-tape pass: wobble,
+  tracking band, chromatic aberration, scanlines, grain, desaturation,
+  vignette. Every artifact scales off one `_Strength`, and at 0 it early-outs
+  and returns the frame untouched, so the pass is free to leave enabled.
+
+`VhsRenderFeature` injects it as a Renderer Feature on `Renderer2D`;
+`VhsController` drives `_Strength` from gameplay — a baseline, plus monster
+proximity, plus being caught, plus being in a task panel, eased together.
+Entirely local: each client computes its own dread from the monster's
+replicated position, and nothing crosses the wire.
+
+Tunables sit in two places on purpose: the **material** holds the authoring
+knobs (how deep the wobble, how tall the band), and the **controller** holds
+the gameplay response. `VhsController.overrideStrength` pins the effect at a
+fixed value in play mode for dialing the material in.
+
+Gotchas:
+
+- `Blit.hlsl` is in **core**, not universal:
+  `Packages/com.unity.render-pipelines.core/Runtime/Utilities/Blit.hlsl`.
+- The Renderer Feature uses the **Render Graph** API. With Compatibility Mode
+  on in Graphics settings, `RecordRenderGraph` never runs and nothing draws.
+- The material is a project **asset**, so `_Strength` persists between play
+  sessions. `OnDisable` resets it to 0.
 
 ## What a shader is
 

@@ -24,9 +24,81 @@ every client. Only things that move or change state need network identity.
 **Composite Operation** dropdown — set it to **Merge**. Without it, each tile
 keeps its own collider and players catch on the seams.
 
+### Doors
+
+Doors are painted, not placed. A doorway is three things:
+
+- **Frame** — 9 ordinary tiles painted into `Walls` as a 3x3. The two middle
+  cells the leaf occupies must carry **no collider**, or the composite blocks
+  the doorway permanently and the door can never open.
+- **Marker** — one `DoorTile` painted on the frame's **center cell**, on a
+  dedicated `Markers` tilemap with its renderer disabled. It draws nothing at
+  runtime; it only marks a position.
+- **Leaf** — the moving panel, a networked prefab the host spawns.
+
+`DoorSpawner` scans the Markers tilemap on `OnServerStarted` and spawns a
+leaf per marker, the same host-spawns/clients-receive pattern as
+[[Monster AI]]'s `MonsterSpawner`. The door prefab lives only in
+`Assets/Prefabs/` and `DefaultNetworkPrefabs.asset` — never in the scene, or
+you get duplicates.
+
+**Why not `tileData.gameObject`?** `TileBase` can instantiate a prefab per
+tile, which looks like the obvious answer. It instantiates **un-networked, per
+client**, so a door one player opened would stay shut for everyone else. The
+tile marks the position; the host spawns.
+
+Because doors only exist while a session runs, empty doorways in the editor
+are correct. It also means leaf alignment can only be checked by hosting —
+hence `DoorTile.leafOffset` being a tunable field rather than computed.
+
+`Door` subclasses `Interactable`, so it inherits the proximity highlight and
+the server-validated E press from [[Tasks]]. Two bools replicate: `IsOpen`,
+and `SwingUp` for which way the leaf swung. The swing is decided once from
+the opener's position and deliberately **not** touched on close, so a door
+shuts the way it opened wherever the player stands.
+
+Collision flips with the replicated bool, **not** when the animation ends.
+Waiting for the animation would let a player walk into a door that looks open
+locally but is still solid on the host.
+
+### Overhead art
+
+Wall tops and anything else that should draw over the player live on their own
+tilemap: no colliders, sorted above the player. `OverheadFader` fades them
+tile by tile in an ellipse around the **local player only** — the monster must
+stay concealed behind overhead art or hiding places stop working. It takes a
+list, so several overhead layers can share one fader.
+
+Purely local presentation. Nothing replicates.
+
+### Gotcha: tiles ship with their color locked
+
+**Tiles generated from a sprite sheet get `TileFlags.LockColor`**, which makes
+`Tilemap.SetColor` do **nothing** — silently. No error, no warning, and
+`GetColor` still reads back the value you just wrote, because the tilemap
+caches it. Every fade looks like it is working while the screen never changes.
+
+All 373 tiles in this project shipped locked. To check and clear:
+
+```
+grep -rh "m_Flags: [^0]" Assets --include="*.asset" | sort | uniq -c
+sed -i '' 's/^  m_Flags: 1$/  m_Flags: 0/' Assets/Art/Tiles/*.asset
+```
+
+**Quit Unity first** — with the project open it holds the assets in memory and
+writes its own copy back over the edit. Reimport afterward.
+
+Clearing the lock is safe on shared tiles: it only makes a tile *capable* of
+per-cell tint. Nothing tints it unless something calls `SetColor`, and only
+`OverheadFader` does, only on the layers it is given.
+
+New art drawn from a sprite sheet comes in locked again, so re-run the grep
+when a fade mysteriously does nothing.
+
 ### Still needed
 
-Multiple rooms, hallways, a second layout.
+Multiple rooms, hallways, a second layout. Vertical (left/right) doors — the
+current `Door` handles up/down swings only.
 
 ## v3 — procedural, deterministic
 

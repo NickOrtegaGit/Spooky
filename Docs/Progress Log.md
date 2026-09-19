@@ -163,10 +163,50 @@ Notes:
   1080p, off elsewhere. Not yet hit in practice.
 - TextMeshPro ships inside `com.unity.ugui` in Unity 6; no separate package.
 
+## 2026-09-19 — VHS effect, doors, overhead fade
+
+Three visual systems, all verified working.
+
+**VHS / cassette-tape distortion.** A fullscreen pass whose strength is driven
+by gameplay — baseline, plus monster proximity, plus caught, plus in-task.
+Distortion becomes a tell, not just a look. Local per client. See [[Shaders]].
+
+**Doors.** Painted into the tilemap rather than placed: frame tiles in Walls,
+a marker tile on a Markers layer, and a networked leaf the host spawns at each
+marker. Server-authoritative open state with a replicated swing direction, so
+a door shuts the way it opened. See [[House Layout]].
+
+**Overhead fade.** Wall tops on their own tilemap fade tile-by-tile around the
+local player, so walking behind something never hides you from yourself. The
+monster deliberately does **not** trigger it — hiding places have to keep
+working. Takes a list of layers. See [[House Layout]].
+
+### Problems hit, and fixes
+
+- **Tiles ship with `TileFlags.LockColor`.** `SetColor` does nothing, with no
+  error, and `GetColor` reads back the value you wrote because the tilemap
+  caches it. Cost most of a session. Full writeup in [[House Layout]] —
+  worth reading before any future tint work.
+- Unity **rewrites asset files from memory** while the project is open, so an
+  external `sed` silently vanished. Quit Unity before editing assets on disk.
+- `Blit.hlsl` is in **core**, not universal.
+- A component that overwrites an Inspector value at runtime fights the
+  Inspector. `Door` originally hardcoded sorting order, so setting it in the
+  Inspector appeared to do nothing; it now offsets from the authored value.
+- Aseprite frames of differing size each center on their own pivot, so a door
+  appears to slide as it opens. Pivot every frame on the hinge instead.
+- `AnimatedTile` cannot do triggered animation — it loops on the tilemap's own
+  clock with no per-tile state. Animated tilemap objects need to be real
+  GameObjects.
+
 ## Next
 
 - [ ] Real minigames on the panel, starting with the typewriter
       ([[Typewriter]])
+- [ ] Vertical (left/right) doors — needs open left/right clips and a second
+      marker tile ([[House Layout]])
+- [ ] Verify the monster stays hidden behind overhead art while the local
+      player is inside a faded region ([[House Layout]])
 - [ ] Decide the real catch penalty once mechanics are fleshed out
 - [ ] Free a task when its occupant **disconnects** mid-minigame — hook
       `ServerReleaseIfOccupiedBy` to `OnClientDisconnectCallback` ([[Tasks]])
