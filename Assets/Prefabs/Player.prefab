@@ -61,8 +61,8 @@ MonoBehaviour:
   m_NormalMapDistance: 3
   m_NormalMapQuality: 2
   m_UseNormalMap: 0
-  m_ShadowsEnabled: 1
-  m_ShadowIntensity: 0.75
+  m_ShadowsEnabled: 0
+  m_ShadowIntensity: 0.264
   m_ShadowSoftness: 0.3
   m_ShadowSoftnessFalloffIntensity: 0.5
   m_ShadowVolumeIntensityEnabled: 0
@@ -180,7 +180,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 110
+  m_SortingOrder: 1000
   m_MaskInteraction: 0
   m_Sprite: {fileID: 9207897629632313789, guid: dddc394a818764e60bf08ac185f5b14d, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -391,7 +391,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 0.2681409}
+  m_Size: {x: 0.5, y: 0.2681409}
   m_EdgeRadius: 0
 --- !u!114 &5753834889414317689
 MonoBehaviour:
