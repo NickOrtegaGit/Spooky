@@ -198,13 +198,45 @@ working. Takes a list of layers. See [[House Layout]].
 - `AnimatedTile` cannot do triggered animation — it loops on the tilemap's own
   clock with no per-tile state. Animated tilemap objects need to be real
   GameObjects.
+- **`Mesh Type: Tight` crops each animation frame to its used pixels**, so
+  frames differ in size and the sprite drifts as it plays. Full Rect fixes it.
+  Changing the pivot afterward invalidates both the tile's `leafOffset` and
+  the prefab's collider offset.
+- **Interaction range was measured from `transform.position`**, which for a
+  bottom-hinged door sits below the doorway. The prompt appeared and the
+  server silently rejected the RPC — no error, no log. Now measured to
+  collider bounds in both places. See [[House Layout]].
+
+## 2026-09-20 — vertical doors
+
+Doors now work in both orientations. `Door.orientation` switches which axis
+decides the swing, so one script covers both; each orientation brings its own
+art, animator controller and prefab. `SwingUp` became `SwingPositive` — up for
+UpDown doors, right for LeftRight ones.
+
+Each `DoorTile` now names its own prefab, so one spawner on one Markers
+tilemap handles every door type.
+
+Also added: closing a door pushes anyone standing in it clear, along the axis
+they walk through the door on. Physics depenetration was exiting by shortest
+overlap, which wedged players into the wall beside a vertical door. See
+[[House Layout]].
+
+### Problems hit, and fixes
+
+- **A sprite dragged into a Tile Palette becomes a plain `Tile`**, not the
+  custom tile type — identical to look at, silently skipped by the spawner.
+  Second time this has cost a session. `DoorSpawner.logScan` now prints each
+  painted cell's real type.
+- Renaming the animator parameter broke the existing horizontal controller
+  until it was renamed to match. Animator parameters are matched by string.
 
 ## Next
 
 - [ ] Real minigames on the panel, starting with the typewriter
       ([[Typewriter]])
-- [ ] Vertical (left/right) doors — needs open left/right clips and a second
-      marker tile ([[House Layout]])
+- [ ] Set **Player Layers** on both door prefabs — it defaults to Everything,
+      so the close-push currently sweeps the monster too ([[House Layout]])
 - [ ] Verify the monster stays hidden behind overhead art while the local
       player is inside a faded region ([[House Layout]])
 - [ ] Decide the real catch penalty once mechanics are fleshed out

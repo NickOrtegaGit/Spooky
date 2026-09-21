@@ -59,7 +59,7 @@ public class PlayerInteractor : NetworkBehaviour
             var interactable = hit.GetComponent<Interactable>();
             if (interactable == null) continue;
 
-            float distance = Vector2.Distance(transform.position, hit.transform.position);
+            float distance = DistanceTo(interactable);
             if (distance >= nearestDistance) continue;
 
             nearest = interactable;
@@ -67,6 +67,24 @@ public class PlayerInteractor : NetworkBehaviour
         }
 
         return nearest;
+    }
+
+    /// <summary>
+    /// Measures to the interactable's collider bounds, not its transform. A
+    /// sprite that pivots somewhere other than its middle — a door hinged at
+    /// its bottom edge — puts transform.position outside the thing the player
+    /// is standing at, so the server would reject an interaction the client
+    /// showed a prompt for.
+    /// </summary>
+    private float DistanceTo(Interactable interactable)
+    {
+        var interactableCollider = interactable.GetComponent<Collider2D>();
+
+        Vector2 point = interactableCollider != null
+            ? interactableCollider.bounds.ClosestPoint(transform.position)
+            : (Vector2)interactable.transform.position;
+
+        return Vector2.Distance(transform.position, point);
     }
 
     private void SetCurrent(Interactable next)
@@ -87,7 +105,7 @@ public class PlayerInteractor : NetworkBehaviour
         if (interactable == null) return;
 
         // Server re-checks range: never trust the client's claim that it is close.
-        float distance = Vector2.Distance(transform.position, interactable.transform.position);
+        float distance = DistanceTo(interactable);
         if (distance > interactRange * 1.5f) return;
 
         interactable.Interact(rpcParams.Receive.SenderClientId);

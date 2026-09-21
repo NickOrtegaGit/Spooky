@@ -32,7 +32,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: closing_down
+  m_Name: closing_right
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions:
@@ -46,7 +46,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: fc7e22ca6cb5a4caeab3c2e3ce0d9f6b, type: 2}
+  m_Motion: {fileID: 7400000, guid: f73166a6ac32a4e61abbd221adc4eb78, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -81,7 +81,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: open_down
+  m_Name: open_right
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions:
@@ -95,7 +95,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: dd31d6d8409b74f3e89b747e74037e02, type: 2}
+  m_Motion: {fileID: 7400000, guid: c37c36da55ba244f489d49fe7493977a, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -108,7 +108,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: closing_up
+  m_Name: closing_left
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions:
@@ -122,7 +122,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: 479c1a4b7db5c4b68861c97ecbbbe60a, type: 2}
+  m_Motion: {fileID: 7400000, guid: d70dba2da6b3f4b77bd7d26004b412cc, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -175,7 +175,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: opening_up
+  m_Name: opening_left
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions:
@@ -189,7 +189,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: c6f60dcfdd6224fa1895953e591edba4, type: 2}
+  m_Motion: {fileID: 7400000, guid: 5a773611d45c3422a992856da0a9f688, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -201,7 +201,7 @@ AnimatorController:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: hor_door
+  m_Name: vert_door
   serializedVersion: 5
   m_AnimatorParameters:
   - m_Name: IsOpen
@@ -211,6 +211,12 @@ AnimatorController:
     m_DefaultBool: 0
     m_Controller: {fileID: 9100000}
   - m_Name: SwingUp
+    m_Type: 4
+    m_DefaultFloat: 0
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 9100000}
+  - m_Name: SwingPositive
     m_Type: 4
     m_DefaultFloat: 0
     m_DefaultInt: 0
@@ -261,7 +267,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: opening_down
+  m_Name: opening_right
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions:
@@ -275,7 +281,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: 3cc2c02a260ab4b0cbd9d14ee4e654dd, type: 2}
+  m_Motion: {fileID: 7400000, guid: 0ae7b0babf7f64379ad2f950d27bad72, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -310,7 +316,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: open_up
+  m_Name: open_left
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions:
@@ -324,7 +330,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: 87120b3c799aa40dab91b527ee81ae8e, type: 2}
+  m_Motion: {fileID: 7400000, guid: 55b457d8d2184447abae015d56919e08, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -385,8 +391,8 @@ AnimatorStateTransition:
   - m_ConditionMode: 1
     m_ConditionEvent: IsOpen
     m_EventTreshold: 0
-  - m_ConditionMode: 1
-    m_ConditionEvent: SwingUp
+  - m_ConditionMode: 2
+    m_ConditionEvent: SwingPositive
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -43266920549498974}
@@ -424,7 +430,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 3438470321918975375, guid: f916d78c3f73e40e7bb94d6b93663fe8, type: 3}
+  m_Motion: {fileID: 3438470321918975375, guid: 4a41f800b10d44f3681b2658bd3b5423, type: 3}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -441,8 +447,8 @@ AnimatorStateTransition:
   - m_ConditionMode: 1
     m_ConditionEvent: IsOpen
     m_EventTreshold: 0
-  - m_ConditionMode: 2
-    m_ConditionEvent: SwingUp
+  - m_ConditionMode: 1
+    m_ConditionEvent: SwingPositive
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 1742413976547283599}

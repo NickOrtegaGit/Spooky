@@ -13,8 +13,13 @@ public class DoorSpawner : MonoBehaviour
     [Tooltip("The tilemap carrying the door markers — the Markers layer, not Walls.")]
     [SerializeField] private Tilemap tilemap;
 
-    [Tooltip("Networked door prefab. Must be in DefaultNetworkPrefabs.asset.")]
-    [SerializeField] private GameObject doorPrefab;
+    [Tooltip("Fallback door prefab, used for markers that name no prefab of their " +
+             "own. Each DoorTile normally carries its own. Must be in " +
+             "DefaultNetworkPrefabs.asset.")]
+    [SerializeField] private GameObject defaultDoorPrefab;
+
+    [Tooltip("Logs every painted cell the scan sees and whether it counts as a DoorTile.")]
+    [SerializeField] private bool logScan = false;
 
     private void Start()
     {
@@ -34,9 +39,9 @@ public class DoorSpawner : MonoBehaviour
 
     private void SpawnDoors()
     {
-        if (tilemap == null || doorPrefab == null)
+        if (tilemap == null)
         {
-            Debug.LogError("DoorSpawner needs both a tilemap and a door prefab.");
+            Debug.LogError("DoorSpawner needs a tilemap.");
             return;
         }
 
@@ -52,14 +57,31 @@ public class DoorSpawner : MonoBehaviour
             TileBase tile = tilemap.GetTile(cell);
             if (tile != null) tilesSeen++;
 
+            if (tile != null && logScan)
+            {
+                Debug.Log($"DoorSpawner: cell {cell} holds '{tile.name}' " +
+                          $"({tile.GetType().Name}), DoorTile = {tile is DoorTile}", this);
+            }
+
             if (tile is not DoorTile doorTile) continue;
+
+            // The marker names its own prefab, so one spawner handles every
+            // orientation — the tile decides which door goes in its frame.
+            GameObject prefab = doorTile.DoorPrefab != null ? doorTile.DoorPrefab : defaultDoorPrefab;
+
+            if (prefab == null)
+            {
+                Debug.LogError($"DoorTile '{doorTile.name}' at {cell} names no door prefab, " +
+                               "and the spawner has no default.", this);
+                continue;
+            }
 
             // The marker sits on the center cell of the frame's 3x3, which is
             // already the horizontal center of the 2-wide leaf. Only the
             // vertical nudge on the tile is usually needed.
             Vector3 position = tilemap.GetCellCenterWorld(cell) + (Vector3)doorTile.LeafOffset;
 
-            GameObject door = Instantiate(doorPrefab, position, Quaternion.identity);
+            GameObject door = Instantiate(prefab, position, Quaternion.identity);
             door.GetComponent<NetworkObject>().Spawn();
             spawned++;
         }

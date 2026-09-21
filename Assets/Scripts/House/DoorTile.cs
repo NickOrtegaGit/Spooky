@@ -20,11 +20,17 @@ public class DoorTile : TileBase
     [Tooltip("Tint for the marker in the editor.")]
     [SerializeField] private Color markerColor = new Color(1f, 0.3f, 0.3f, 0.6f);
 
-    [Header("Leaf placement")]
+    [Header("Leaf")]
+    [Tooltip("The door prefab spawned at this marker. Leave empty to fall back to " +
+             "the spawner's default. Each orientation needs its own prefab — they " +
+             "differ in art, animator and Door.orientation.")]
+    [SerializeField] private GameObject doorPrefab;
+
     [Tooltip("Offset from the marker cell's center to where the leaf sits, in world units. " +
              "A 2-tall leaf in a 3-tall frame usually needs a nudge here.")]
     [SerializeField] private Vector2 leafOffset = Vector2.zero;
 
+    public GameObject DoorPrefab => doorPrefab;
     public Vector2 LeafOffset => leafOffset;
 
     public override void GetTileData(Vector3Int position, ITilemap tilemap, ref TileData tileData)

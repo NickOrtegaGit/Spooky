@@ -32,8 +32,14 @@ Doors are painted, not placed. A doorway is three things:
   cells the leaf occupies must carry **no collider**, or the composite blocks
   the doorway permanently and the door can never open.
 - **Marker** — one `DoorTile` painted on the frame's **center cell**, on a
-  dedicated `Markers` tilemap with its renderer disabled. It draws nothing at
-  runtime; it only marks a position.
+  dedicated Markers tilemap with its renderer disabled. It draws nothing at
+  runtime; it only marks a position, and names the prefab to spawn there.
+
+  **Gotcha:** dragging a marker *sprite* into a Tile Palette makes Unity
+  generate a plain `Tile` from it, which looks identical and is silently
+  skipped by the spawner. Drag the **`DoorTile` asset** into the palette
+  instead. This has now cost two debugging sessions; `DoorSpawner.logScan`
+  prints each painted cell's actual type.
 - **Leaf** — the moving panel, a networked prefab the host spawns.
 
 `DoorSpawner` scans the Markers tilemap on `OnServerStarted` and spawns a
@@ -53,13 +59,46 @@ hence `DoorTile.leafOffset` being a tunable field rather than computed.
 
 `Door` subclasses `Interactable`, so it inherits the proximity highlight and
 the server-validated E press from [[Tasks]]. Two bools replicate: `IsOpen`,
-and `SwingUp` for which way the leaf swung. The swing is decided once from
-the opener's position and deliberately **not** touched on close, so a door
-shuts the way it opened wherever the player stands.
+and `SwingPositive` for which way the leaf swung. The swing is decided once
+from the opener's position and deliberately **not** touched on close, so a
+door shuts the way it opened wherever the player stands.
 
 Collision flips with the replicated bool, **not** when the animation ends.
 Waiting for the animation would let a player walk into a door that looks open
 locally but is still solid on the host.
+
+#### Both orientations, one script
+
+`Door.orientation` is `UpDown` or `LeftRight`, and everything axis-dependent
+reads it: which coordinate decides the swing, and which way a player gets
+pushed on close. `SwingPositive` means **up** for an UpDown door and **right**
+for a LeftRight one — hence the axis-neutral name.
+
+Each orientation needs its own **animator controller** (the clips differ) and
+its own **prefab** (art, controller, `orientation`). They share the same
+seven-state structure and the same two parameters.
+
+Each `DoorTile` carries its own **door prefab** and `leafOffset`, so one
+`DoorSpawner` on one Markers tilemap handles every orientation — the marker
+decides which door goes in its frame. Both marker types paint onto the same
+tilemap.
+
+#### Pushing players clear
+
+Closing a door on someone standing in it turns the collider solid under them.
+Left to physics, depenetration exits by the **shortest overlap**, which for a
+tall vertical door is up or down — straight into the wall.
+
+So the close explicitly pushes players out, along the axis they walk
+**through** the door on: up/down through an UpDown door, left/right through a
+LeftRight one. Not along the doorway's span, which is where the wall is.
+
+Server-side sweep, plus an RPC to the pushed player's own client: the owner
+simulates its own movement, so a server-only transform change is overwritten
+on the next input frame. The RPC also zeroes velocity, or they drift back in.
+
+Set **Player Layers** on each door prefab — it defaults to Everything, which
+would sweep the monster too.
 
 ### Overhead art
 
@@ -70,6 +109,35 @@ stay concealed behind overhead art or hiding places stop working. It takes a
 list, so several overhead layers can share one fader.
 
 Purely local presentation. Nothing replicates.
+
+### Gotcha: animated sprites drift unless the frames are uniform
+
+A door that slides around as it animates is an **import** problem, not an
+animation one. Three settings have to agree:
+
+- **Mesh Type: Full Rect**, not Tight. Tight crops every frame to its used
+  pixels, so frames end up different sizes and each centers on its own pivot.
+  The Sprite Editor shows this — the frame rectangles will not match.
+- **Pivot Alignment** on the hinge, not a corner. For an up/down door that is
+  Bottom Center.
+- The Aseprite canvas the same size across all tags, with the hinge on the
+  same pixel.
+
+Changing the pivot moves the sprite relative to its transform, so
+`DoorTile.leafOffset` **and** the prefab's collider offset both need retuning
+afterward. Expect to redo them together.
+
+### Gotcha: interaction range measured from the pivot
+
+`PlayerInteractor` measures to an interactable's **collider bounds**, via
+`ClosestPoint`, not to `transform.position`. A door hinged at its bottom edge
+has its transform below the whole doorway, so a pivot-based check rejected
+interactions from above while the client still drew the prompt — a silent
+failure with no log anywhere.
+
+Client detection and the server's re-check share the same helper so they can
+never disagree. Any future interactable with an off-center pivot depends on
+this.
 
 ### Gotcha: tiles ship with their color locked
 

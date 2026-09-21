@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f0a1fe31dc72546e09f791899db8af3c, type: 3}
-  m_Name: DoorTile
+  m_Name: vert_door_tile
   m_EditorClassIdentifier: Assembly-CSharp::DoorTile
-  markerSprite: {fileID: -5111445336110048992, guid: 3f0b80949faa34e67a37b7cfc7ef0269, type: 3}
+  markerSprite: {fileID: -6208568489671088504, guid: 733a6fdbd643f44e4844ec9c952606c0, type: 3}
   markerColor: {r: 1, g: 0.3, b: 0.3, a: 0.6}
-  doorPrefab: {fileID: 3862567263219502154, guid: 3d1ffd4c9f3cc472b9d54dc2e2c0a33d, type: 3}
-  leafOffset: {x: 0, y: -4.5}
+  doorPrefab: {fileID: 2305675380586452888, guid: d8126bda232a94c15b0ea5c6034dbf76, type: 3}
+  leafOffset: {x: 0, y: 0}
