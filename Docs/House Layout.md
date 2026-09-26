@@ -83,6 +83,24 @@ Each `DoorTile` carries its own **door prefab** and `leafOffset`, so one
 decides which door goes in its frame. Both marker types paint onto the same
 tilemap.
 
+#### Bursting through
+
+A player at full sprint opens a closed door by reaching it, with no keypress —
+fleeing down a corridor is not interrupted by a doorway. It uses the same
+interaction collider as the E press, so the door opens just before contact
+rather than after a stall.
+
+`burstSpeedFraction` (0.95) is of **sprint** speed, so it takes a real run-up;
+a short corridor will not do it. The owner decides whether to ask and the
+server re-checks the speed against the rigidbody it owns, since a client
+claiming to sprint is exactly the thing to distrust.
+
+It routes through the normal `Interact`, so the swing direction, cooldown and
+animation behave as usual. It never closes a door, only opens one.
+
+**Should be markedly louder than a normal open** — see [[Noise]], which is not
+built yet. The TODO is in `Door.ServerTryBurstOpen`.
+
 #### Pushing players clear
 
 Closing a door on someone standing in it turns the collider solid under them.

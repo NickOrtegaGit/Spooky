@@ -277,10 +277,40 @@ rather than the run. See [[Tasks]].
   non-trigger. The table needs both, on separate objects.
 - `Light` vs `Light 2D` again — already in this log from 2026-09-14.
 
+## 2026-09-26 — sprint and stamina
+
+Shift sprints: faster forward, but committed to a heading. Turning at speed is
+deliberately slower than accelerating, so sprinting is a trade rather than a
+straight upgrade. Stamina is server-authoritative and replicates to the owner
+only — nobody else sees you winded. Bottoming out locks sprinting until the
+bar refills, after a longer pause. See [[Player]].
+
+The bar sits above the player's head like the interact prompt, owner-only.
+
+Also: a player at full sprint now **bursts closed doors open** by running at
+them, so fleeing is not interrupted by doorways. See [[House Layout]].
+
+Wrote [[Noise]] — the monster only sees, and hearing is the missing half that
+several systems already assume. Nothing built yet; the doc lays out what
+should make noise and why it is what makes the monster foolable.
+
+### Problems hit, and fixes
+
+- **Has Exit Time** on the walk/sprint transition again. Third animator
+  transition delay in this project — always check it first.
+- A remote client's rigidbody is Kinematic and reports **zero velocity**, so
+  the owner could not tell whether it was sprinting. Speed is now measured
+  from actual transform movement on non-server copies.
+- The sprint animation lagged the keypress by a network round trip. The owner
+  now drives its own `IsSprinting`, gated on its own stamina so it never shows
+  a sprint the server is refusing.
+
 ## Next
 
-- [ ] Real minigames on the panel, starting with the typewriter
-      ([[Typewriter]])
+- [ ] **Noise system** — the monster cannot hear, so tasks are not yet
+      dangerous. [[Noise]] has the design; [[Monster AI]] needs an investigate
+      state. Probably the highest-value thing left.
+- [ ] More minigames — lightbulb, fireplace, sweeping ([[Tasks]])
 - [ ] Set **Player Layers** on both door prefabs — it defaults to Everything,
       so the close-push currently sweeps the monster too ([[House Layout]])
 - [ ] Verify the monster stays hidden behind overhead art while the local

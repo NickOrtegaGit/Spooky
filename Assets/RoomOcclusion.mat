@@ -42,7 +42,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _EnableExternalAlpha: 0
-    - _FadeAlpha: 0.9951467
+    - _FadeAlpha: 0.9976781
     - _StencilRef: 1
     - _ZWrite: 0
     m_Colors:

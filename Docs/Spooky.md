@@ -22,6 +22,7 @@ Tone: scary but silly, not grim.
 - [[Networking]]
 - [[Player]]
 - [[Monster AI]]
+- [[Noise]]
 - [[Tasks]]
 - [[Typewriter]]
 - [[Items]]

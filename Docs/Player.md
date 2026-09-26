@@ -36,6 +36,46 @@ Key details:
 Expected: slight input lag on your own cube. That is the server-authoritative
 design working, not a bug. Client-side prediction would fix it; not needed yet.
 
+## Sprint and stamina
+
+**Shift** sprints. Sprinting is faster in a straight line but **commits you to
+a heading** — the trade, not a straight upgrade.
+
+`PlayerMovement` steers rather than snapping while sprinting: the needed
+velocity change is split into the part **along** the current heading and the
+part **across** it, and each approaches its target at its own rate.
+`sprintTurnAcceleration` is lower than `sprintAcceleration`, so turning at
+speed costs distance. Walking still sets velocity directly and turns on a dime.
+
+`PlayerStamina` is server-authoritative for the same reason movement is — a
+client reporting its own stamina could sprint forever, and sprinting away from
+the monster is exactly what is worth cheating at. The value replicates with
+`NetworkVariableReadPermission.Owner`, so **only you ever receive your own
+stamina**; other clients cannot see it at all.
+
+Running the bar to empty locks sprinting out until it refills, and waits
+`exhaustedRecoveryDelay` before recovery even begins — the Breath of the Wild
+penalty. Everything is tunable in the Inspector.
+
+`StaminaBar` sits above the player's head like the interact prompt, fades in
+when stamina drains and out once it is full. Owner-only, and it scales the
+fill sprite's X — which requires the fill sprite's **pivot on its left edge**,
+or it drains toward its middle.
+
+Gotchas:
+
+- **The animation switch cannot wait for the server.** Movement hides the
+  round trip behind acceleration; an animation switch does not, so the owner
+  drives `IsSprinting` from its own input and remote copies use the replicated
+  value. The owner also gates on its own stamina, so it never shows a sprint
+  it is not getting.
+- **Uncheck Has Exit Time** on the walk/sprint transitions. With it on, the
+  switch waits for the current walk cycle to finish. Third time an animator
+  transition has caused a mystery delay in this project — see
+  [[House Layout]].
+- Sprint frames must import with the **same Mesh Type and pivot** as the walk
+  frames, or the sprite jumps when the clip changes.
+
 ## Animation
 
 Art: `Assets/Art/Players/P1/Player_1.aseprite` — 8 tags (`idle_` / `walk_`

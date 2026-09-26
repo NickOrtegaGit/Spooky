@@ -18,6 +18,7 @@ public class PlayerInteractor : NetworkBehaviour
 
     private Interactable current;
     private PlayerState state;
+    private PlayerMovement movement;
     private InteractPrompt prompt;
 
     public Interactable Current => current;
@@ -25,6 +26,7 @@ public class PlayerInteractor : NetworkBehaviour
     private void Awake()
     {
         state = GetComponent<PlayerState>();
+        movement = GetComponent<PlayerMovement>();
         prompt = GetComponentInChildren<InteractPrompt>(true);
     }
 
@@ -45,11 +47,44 @@ public class PlayerInteractor : NetworkBehaviour
 
         if (prompt != null) prompt.SetInRange(current != null);
 
+        TryBurstDoor();
+
         if (current != null && Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
         {
             InteractServerRpc(current.NetworkObjectId);
             if (prompt != null) prompt.SuppressAfterInteract();
         }
+    }
+
+    /// <summary>
+    /// Owner side. A player at full sprint opens a closed door by reaching it,
+    /// so fleeing down a corridor is not interrupted by a doorway. The server
+    /// re-checks the speed, so a client cannot claim to be sprinting.
+    /// </summary>
+    private void TryBurstDoor()
+    {
+        if (current is not Door door || door.IsOpen) return;
+        if (movement == null || !movement.IsAtBurstSpeed(door.BurstSpeedFraction)) return;
+
+        BurstDoorServerRpc(door.NetworkObjectId);
+    }
+
+    [Rpc(SendTo.Server)]
+    private void BurstDoorServerRpc(ulong doorId, RpcParams rpcParams = default)
+    {
+        if (!NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(doorId, out var netObj)) return;
+
+        var door = netObj.GetComponent<Door>();
+        if (door == null) return;
+
+        float distance = DistanceTo(door);
+        if (distance > (interactRange + door.ExtraInteractRange) * 1.5f) return;
+
+        // Never trust the client's claim that it is running fast enough — the
+        // server owns the rigidbody and can just look.
+        if (movement == null || !movement.IsAtBurstSpeed(door.BurstSpeedFraction)) return;
+
+        door.ServerTryBurstOpen(rpcParams.Receive.SenderClientId);
     }
 
     private Interactable FindNearest()

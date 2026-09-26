@@ -66,14 +66,34 @@ public class DishStackMinigame : PanelMinigame
     [SerializeField] private TMP_Text progressLabel;
     [SerializeField] private TMP_Text messageLabel;
 
+    [Tooltip("Seconds after the panel is up before the labels begin to appear.")]
+    [SerializeField] private float labelDelaySeconds = 0.4f;
+
+    [Tooltip("Seconds the labels take to fade in.")]
+    [SerializeField] private float labelFadeSeconds = 0.5f;
+
+    [Tooltip("Seconds the labels take to fade out when the task ends. Runs " +
+             "before the panel slides away.")]
+    [SerializeField] private float labelFadeOutSeconds = 0.2f;
+
     private readonly List<Rigidbody2D> placed = new List<Rigidbody2D>();
 
+    private Coroutine labelFade;
     private Rigidbody2D sliding;
     private Rigidbody2D basePlate;
     private float slideDirection = 1f;
     private float slideOriginX;
     private bool acceptingInput;
     private bool finished;
+
+    /// <summary>
+    /// Hide the labels before the panel even starts sliding. OnPanelReady only
+    /// runs once it is up, which would leave them visible for the whole slide.
+    /// </summary>
+    private void Awake()
+    {
+        SetLabelAlpha(0f);
+    }
 
     protected override void OnPanelReady()
     {
@@ -98,7 +118,35 @@ public class DishStackMinigame : PanelMinigame
         if (spawnBasePlate) SpawnBasePlate();
 
         UpdateProgress();
+        labelFade = StartCoroutine(FadeInLabels());
         SpawnNextPlate();
+    }
+
+    /// <summary>
+    /// Holds the labels back a moment, then eases them in, so the panel settles
+    /// before the text arrives rather than everything appearing at once.
+    /// </summary>
+    private IEnumerator FadeInLabels()
+    {
+        SetLabelAlpha(0f);
+
+        if (labelDelaySeconds > 0f) yield return new WaitForSeconds(labelDelaySeconds);
+
+        float elapsed = 0f;
+        while (elapsed < labelFadeSeconds)
+        {
+            elapsed += Time.deltaTime;
+            SetLabelAlpha(Mathf.Clamp01(elapsed / labelFadeSeconds));
+            yield return null;
+        }
+
+        SetLabelAlpha(1f);
+    }
+
+    private void SetLabelAlpha(float alpha)
+    {
+        if (progressLabel != null) progressLabel.alpha = alpha;
+        if (messageLabel != null) messageLabel.alpha = alpha;
     }
 
     /// <summary>
@@ -292,9 +340,28 @@ public class DishStackMinigame : PanelMinigame
         if (progressLabel != null) progressLabel.text = $"{placed.Count} / {plateCount}";
     }
 
-    /// <summary>Hold the outcome on screen for a beat before the panel drops.</summary>
+    /// <summary>
+    /// Fade the labels out before the panel drops, so they are gone by the time
+    /// it starts moving rather than lingering over an empty screen.
+    /// </summary>
     protected override IEnumerator EndSequence(bool success)
     {
-        yield return new WaitForSeconds(0.6f);
+        // Quitting early can land mid-fade-in; that coroutine would keep
+        // raising alpha while this lowers it.
+        if (labelFade != null)
+        {
+            StopCoroutine(labelFade);
+            labelFade = null;
+        }
+
+        float elapsed = 0f;
+        while (elapsed < labelFadeOutSeconds)
+        {
+            elapsed += Time.deltaTime;
+            SetLabelAlpha(1f - Mathf.Clamp01(elapsed / labelFadeOutSeconds));
+            yield return null;
+        }
+
+        SetLabelAlpha(0f);
     }
 }

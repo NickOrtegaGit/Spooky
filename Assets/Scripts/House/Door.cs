@@ -38,6 +38,15 @@ public class Door : Interactable
     [Tooltip("Seconds before the door can be toggled again — stops animation spam.")]
     [SerializeField] private float toggleCooldown = 0.5f;
 
+    [Header("Bursting")]
+    [Tooltip("A player sprinting flat out opens this door by running at it, " +
+             "without pressing anything.")]
+    [SerializeField] private bool canBurstOpen = true;
+
+    [Tooltip("Fraction of sprint speed a player must be at to burst through. " +
+             "1 means flat out, so a short corridor will not do it.")]
+    [SerializeField, Range(0.5f, 1f)] private float burstSpeedFraction = 0.95f;
+
     [Header("Closing")]
     [Tooltip("Push players standing in the doorway clear when it shuts. Without " +
              "this, physics depenetration picks its own direction and can wedge " +
@@ -81,6 +90,9 @@ public class Door : Interactable
     private float nextToggleTime;
 
     public bool IsOpen => isOpen.Value;
+
+    /// <summary>Fraction of sprint speed needed to burst this door open.</summary>
+    public float BurstSpeedFraction => burstSpeedFraction;
     public bool SwungPositive => swingPositive.Value;
 
     protected override void Awake()
@@ -123,6 +135,22 @@ public class Door : Interactable
     {
         isOpen.OnValueChanged -= OnOpenChanged;
         swingPositive.OnValueChanged -= OnSwingChanged;
+    }
+
+    /// <summary>
+    /// Server only. A player running flat out opens the door by arriving at
+    /// it, so a sprint down a corridor does not stall on a doorway. Ignored if
+    /// the door is already open, and it never closes one.
+    /// </summary>
+    public void ServerTryBurstOpen(ulong clientId)
+    {
+        if (!IsServer || !canBurstOpen) return;
+        if (isOpen.Value) return;
+        if (Time.time < nextToggleTime) return;
+
+        // TODO: this should be markedly louder than a normal open once the
+        // noise system exists. See Docs/Noise.md.
+        Interact(clientId);
     }
 
     public override void Interact(ulong clientId)
