@@ -305,6 +305,38 @@ should make noise and why it is what makes the monster foolable.
   now drives its own `IsSprinting`, gated on its own stamina so it never shows
   a sprint the server is refusing.
 
+## 2026-09-26 (evening) — menu, character select, van (flow)
+
+**Verified across two instances:** host and client both go MainMenu ->
+Character -> Van -> House and spawn in the house together. Step 1 of the van
+lobby; seats are next. See [[Session Flow]].
+
+- MainMenu has Host and Join. Join checks its code with Relay before
+  moving on, without connecting
+- Character: name + skin, arrows or A/D, working with one skin via
+  `SkinCatalog`. Name and skin remembered between launches
+- **Nothing connects until the character screen's Continue** — NGO's scene
+  sync would otherwise drag a joining client straight into the van
+- `SessionManager` owns approval (no auto-spawned players, refuses late and
+  full joins), scene flow, and spawning players once the house has loaded
+  on every client
+- Monster and door spawners wait for `HouseReady` instead of
+  `OnServerStarted`, which now fires back in the menu
+- Play always starts from MainMenu (Tools > Spooky toggle)
+
+### Problems hit, and fixes
+
+- **Two RelayConnectionManagers on the NetworkManager object.** The second
+  one's duplicate check destroyed its own GameObject — taking the
+  NetworkManager with it — so every screen reported no Relay manager. The
+  check now removes only the extra component when both share an object.
+- **No cursor in the van.** `CursorControl` was on the NetworkManager
+  object, so it moved to MainMenu, persisted, and locked the cursor on
+  session start — which now happens before the van. It locks only in the
+  house now.
+- Join panel children all sat at (0, 0), so BACK covered the code box and
+  Join button. Last sibling draws on top.
+
 ## Next
 
 - [ ] **Noise system** — the monster cannot hear, so tasks are not yet
@@ -318,4 +350,7 @@ should make noise and why it is what makes the monster foolable.
 - [ ] Decide the real catch penalty once mechanics are fleshed out
 - [ ] Free a task when its occupant **disconnects** mid-minigame — hook
       `ServerReleaseIfOccupiedBy` to `OnClientDisconnectCallback` ([[Tasks]])
-- [ ] Replace the OnGUI HUD with a real menu; wire up Lobby ([[Networking]])
+- [ ] **Van seats** — replicated seat list, name + skin in `ConnectionData`,
+      "x/4 joined" on every screen ([[Session Flow]] step 2)
+- [ ] Van art + animation, character screen polish ([[Session Flow]] step 3)
+- [ ] A way back to the menu from the van/house (host leaving ends it for all)

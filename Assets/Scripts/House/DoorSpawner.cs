@@ -21,20 +21,17 @@ public class DoorSpawner : MonoBehaviour
     [Tooltip("Logs every painted cell the scan sees and whether it counts as a DoorTile.")]
     [SerializeField] private bool logScan = false;
 
-    private void Start()
+    // Awake, not Start: with only the host in the session, the house can
+    // finish loading everywhere before this scene's Start runs.
+    // HouseReady only fires on the server, so clients never spawn anything.
+    private void Awake()
     {
-        var nm = NetworkManager.Singleton;
-        if (nm == null) return;
-
-        nm.OnServerStarted += SpawnDoors;
+        SessionManager.HouseReady += SpawnDoors;
     }
 
     private void OnDestroy()
     {
-        if (NetworkManager.Singleton != null)
-        {
-            NetworkManager.Singleton.OnServerStarted -= SpawnDoors;
-        }
+        SessionManager.HouseReady -= SpawnDoors;
     }
 
     private void SpawnDoors()

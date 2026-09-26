@@ -258,6 +258,8 @@ MonoBehaviour:
   startsOpen: 0
   startsSwungPositive: 0
   toggleCooldown: 0.5
+  canBurstOpen: 1
+  burstSpeedFraction: 0.95
   pushPlayersOnClose: 1
   pushClearance: 0.6
   playerLayers:

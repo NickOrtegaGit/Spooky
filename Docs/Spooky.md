@@ -19,6 +19,7 @@ Tone: scary but silly, not grim.
 
 ## Systems
 
+- [[Session Flow]] — menu, character select, the van lobby
 - [[Networking]]
 - [[Player]]
 - [[Monster AI]]

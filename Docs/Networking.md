@@ -72,7 +72,10 @@ means the browser target needs no connection-layer rework.
 
 ### Still to do
 
-- Lobby (player list, names, ready state) — package installed, not used yet
-- A real menu; `RelayHUD` is throwaway OnGUI
+- ~~A real menu~~ — replaced by MainMenu / Character / Van, see
+  [[Session Flow]]. `RelayHUD` is deleted.
+- The Lobby *service* is not needed for the van: players join by code, and
+  the van's seats are replicated by NGO itself. Lobby only matters if public
+  matchmaking is ever wanted.
 - ~~Test across two machines~~ — **done 2026-09-13, worked first try.**
   Two Macs on different networks, connected by join code, no port forwarding.
