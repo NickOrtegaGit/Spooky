@@ -11,6 +11,11 @@ public class PlayerInteractor : NetworkBehaviour
     [SerializeField] private float interactRange = 1.5f;
     [SerializeField] private LayerMask interactableLayers;
 
+    [Tooltip("How far past interactRange the sweep looks, so objects that grant " +
+             "themselves extra reach are still found. Must be at least the " +
+             "largest Extra Interact Range in the scene.")]
+    [SerializeField] private float maxExtraInteractRange = 3f;
+
     private Interactable current;
     private PlayerState state;
     private InteractPrompt prompt;
@@ -49,7 +54,10 @@ public class PlayerInteractor : NetworkBehaviour
 
     private Interactable FindNearest()
     {
-        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, interactRange, interactableLayers);
+        // Sweep wide enough to find objects that extend their own reach; each
+        // one is then range-checked against its own allowance below.
+        Collider2D[] hits = Physics2D.OverlapCircleAll(
+            transform.position, interactRange + maxExtraInteractRange, interactableLayers);
 
         Interactable nearest = null;
         float nearestDistance = float.MaxValue;
@@ -60,6 +68,9 @@ public class PlayerInteractor : NetworkBehaviour
             if (interactable == null) continue;
 
             float distance = DistanceTo(interactable);
+
+            // An object may reach further than the player's base range.
+            if (distance > interactRange + interactable.ExtraInteractRange) continue;
             if (distance >= nearestDistance) continue;
 
             nearest = interactable;
@@ -104,9 +115,11 @@ public class PlayerInteractor : NetworkBehaviour
         var interactable = netObj.GetComponent<Interactable>();
         if (interactable == null) return;
 
-        // Server re-checks range: never trust the client's claim that it is close.
+        // Server re-checks range: never trust the client's claim that it is
+        // close. The object's own allowance is included, or a door that grants
+        // itself extra reach would prompt on the client and be refused here.
         float distance = DistanceTo(interactable);
-        if (distance > interactRange * 1.5f) return;
+        if (distance > (interactRange + interactable.ExtraInteractRange) * 1.5f) return;
 
         interactable.Interact(rpcParams.Receive.SenderClientId);
     }

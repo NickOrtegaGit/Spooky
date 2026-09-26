@@ -15,4 +15,4 @@ MonoBehaviour:
   markerSprite: {fileID: -6208568489671088504, guid: 733a6fdbd643f44e4844ec9c952606c0, type: 3}
   markerColor: {r: 1, g: 0.3, b: 0.3, a: 0.6}
   doorPrefab: {fileID: 2305675380586452888, guid: d8126bda232a94c15b0ea5c6034dbf76, type: 3}
-  leafOffset: {x: 0, y: 0}
+  leafOffset: {x: 0, y: -1.5}

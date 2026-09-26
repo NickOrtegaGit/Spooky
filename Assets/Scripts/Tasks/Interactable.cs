@@ -11,6 +11,11 @@ public class Interactable : NetworkBehaviour
     private static readonly int FlashColorId = Shader.PropertyToID("_FlashColor");
 
     [SerializeField] private string prompt = "Use";
+
+    [Tooltip("Extra reach for this object, added to the player's interact range. " +
+             "0 uses the player's range as-is. Useful for something large or " +
+             "awkwardly shaped, like a tall door.")]
+    [SerializeField] private float extraInteractRange = 0f;
     [SerializeField] private Color highlightColor = Color.white;
     [SerializeField, Range(0f, 1f)] private float highlightStrength = 1f;
 
@@ -19,6 +24,9 @@ public class Interactable : NetworkBehaviour
     private bool highlighted;
 
     public string Prompt => prompt;
+
+    /// <summary>Added to the player's interact range for this object.</summary>
+    public float ExtraInteractRange => extraInteractRange;
 
     protected virtual void Awake()
     {

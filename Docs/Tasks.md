@@ -107,6 +107,46 @@ See [[Gameplay Loop]] for the full round.
   through it.
 - **Noise:** doing a task attracts the monster. Tasks summon the threat.
 
+### Built: the dish stack
+
+`Assets/Scripts/Minigames/DishStack*.cs`. Stack plates without dropping one on
+the table.
+
+A plate slides across the top of the stack; space stops it and it falls a
+short distance onto the pile. Land it lopsided and the stack tips. Slide speed
+rises per plate, so it tightens as you go. **X** leaves at any time — progress
+is lost and the next attempt starts fresh.
+
+A **static base plate** spawns first so the opening plate has something to
+land on; without it the first drop is an instant loss.
+
+**The stage is real 2D physics**, living far from the house at (500, 500) on
+its own `DishStage` layer, filmed by its own orthographic camera into a
+RenderTexture the panel displays through a RawImage. UI space has no physics,
+and hand-rolled tipping would not feel the same.
+
+`DishStackStage` is a scene singleton for the same reason `PatrolRoute` is:
+the panel is a prefab and cannot hold scene references.
+
+Gotchas, all of which cost time:
+
+- **Render features run on off-screen cameras too.** `RoomOcclusionFeature`
+  and `VhsRenderFeature` were painting over the stage's RenderTexture — the
+  stage sits outside every room, so occlusion blacked it out entirely. Both
+  now skip any camera with a `targetTexture`. A `cameraType == Game` check is
+  **not** enough; an off-screen camera is still a Game camera.
+- The table needs **two colliders**: a solid one plates land on, and a
+  separate trigger as the fail zone. One collider cannot do both — a trigger
+  does not block, and `OnTriggerEnter2D` never fires on a non-trigger.
+- Collider **Density** only matters with **Use Auto Mass** on the Rigidbody2D.
+  Two colliders at different densities give a plate a center-weighted mass.
+- A RenderTexture wants `R8G8B8A8_SRGB` and **Point** filtering. UNORM renders
+  dark; bilinear renders soft.
+- For crisp pixels the RawImage must be an **integer multiple** of the stage
+  art: 64px art → 512 (8x). Anything else resamples unevenly.
+- Unity's `Light` and `Light 2D` are different components — the 3D one does
+  nothing to sprites. Already in [[Progress Log]]; hit again anyway.
+
 ### Reference minigame: the typewriter
 
 See [[Typewriter]] for the full spec. It sets the tone for what a "task"

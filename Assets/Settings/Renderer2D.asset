@@ -1,5 +1,20 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-7835035924198496228
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d62ce0962bb6643e8a27588f07218129, type: 3}
+  m_Name: RoomOcclusionFeature
+  m_EditorClassIdentifier: Assembly-CSharp::RoomOcclusionFeature
+  m_Active: 1
+  material: {fileID: 2100000, guid: febf8dd60549c4c9a9d803dcffd2056f, type: 2}
+  injectionPoint: 550
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -25,8 +40,9 @@ MonoBehaviour:
     probeSamplingDebugTexture: {fileID: 2800000, guid: 24ec0e140fb444a44ab96ee80844e18e, type: 3}
     probeVolumeBlendStatesCS: {fileID: 0}
   m_RendererFeatures:
+  - {fileID: -7835035924198496228}
   - {fileID: 7050362107691756000}
-  m_RendererFeatureMap: e069d786fbead761
+  m_RendererFeatureMap: 1c68b9b7565c4493e069d786fbead761
   m_UseNativeRenderPass: 0
   m_LayerMask:
     serializedVersion: 2

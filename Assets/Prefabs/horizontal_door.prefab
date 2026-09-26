@@ -84,7 +84,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 2
   m_MaskInteraction: 0
   m_Sprite: {fileID: -7560207813205414103, guid: f916d78c3f73e40e7bb94d6b93663fe8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -251,6 +251,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Door
   ShowTopMostFoldoutHeaderGroup: 1
   prompt: Use
+  extraInteractRange: 0
   highlightColor: {r: 1, g: 1, b: 1, a: 1}
   highlightStrength: 1
   orientation: 0

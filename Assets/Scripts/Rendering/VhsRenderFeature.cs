@@ -31,6 +31,11 @@ public class VhsRenderFeature : ScriptableRendererFeature
         // Scene view and preview cameras stay clean — the effect is for play.
         if (renderingData.cameraData.cameraType != CameraType.Game) return;
 
+        // Off-screen stages rendering into a texture are content shown inside
+        // the world, not the player's view of it — distorting them twice would
+        // be wrong.
+        if (renderingData.cameraData.camera.targetTexture != null) return;
+
         renderer.EnqueuePass(pass);
     }
 

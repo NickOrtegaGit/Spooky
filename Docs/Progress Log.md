@@ -231,6 +231,52 @@ overlap, which wedged players into the wall beside a vertical door. See
 - Renaming the animator parameter broke the existing horizontal controller
   until it was renamed to match. Animator parameters are matched by string.
 
+## 2026-09-25 — room occlusion
+
+**The room you are in is all you can see.** Everything outside its polygon is
+black — other players, the monster, and the flashlight beam, which now stops
+at the boundary for free because the mask draws over it.
+
+Rooms are hand-drawn `PolygonCollider2D` regions; a stencil pass fills
+everywhere outside the current one. Crossing a threshold cross-fades so the
+screen never blinks. See [[House Layout]].
+
+Built in two phases deliberately — tracking and stickiness first with a crude
+mask, then the render feature once the behavior was proven. Worth repeating:
+the logic was right on the first try and all the trouble would have been in
+the rendering.
+
+Notes:
+
+- The material's shader has to be set by hand. Create → Material gives the
+  default sprite shader whatever you right-clicked.
+- Debug the mask in **red**. At 0.08 global light, a black mask that works and
+  one that never renders look identical.
+- The room polygon is the **visible** extent, not the walkable one. A hallway
+  meant to be seen end to end is one Room however many doorways it has.
+
+## 2026-09-25 (later) — the dish stack minigame
+
+**The first real minigame.** Stack plates without dropping one on the table;
+space drops the sliding plate, X leaves. Real 2D physics on an off-screen
+stage, filmed into a RenderTexture the panel displays.
+
+The design shape the typewriter was after, without the typing: long enough to
+be a commitment, failure unambiguously your own fault, and the cost is time
+rather than the run. See [[Tasks]].
+
+### Problems hit, and fixes
+
+- **Render features ran on the off-screen stage camera**, blacking out the
+  RenderTexture — the stage sits outside every room, so room occlusion painted
+  over all of it. Checking `cameraType == Game` was not enough; an off-screen
+  camera is still a Game camera. Both features now skip cameras with a
+  `targetTexture`. This one took a long detour through camera settings and
+  color formats before I looked at my own render features.
+- A trigger collider does not block, and `OnTriggerEnter2D` never fires on a
+  non-trigger. The table needs both, on separate objects.
+- `Light` vs `Light 2D` again — already in this log from 2026-09-14.
+
 ## Next
 
 - [ ] Real minigames on the panel, starting with the typewriter

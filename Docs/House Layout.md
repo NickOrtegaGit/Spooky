@@ -100,6 +100,44 @@ on the next input frame. The RPC also zeroes velocity, or they drift back in.
 Set **Player Layers** on each door prefab — it defaults to Everything, which
 would sweep the monster too.
 
+### Room occlusion
+
+The player sees only the room they are in. Everything outside it is black —
+including other players and the monster, and including the flashlight beam,
+which stops at the room boundary because the mask draws over it.
+
+- **`Room`** — a `PolygonCollider2D` (trigger) marking one room's **visible**
+  extent. Draw it to include everything that should be seen from inside: floor,
+  walls, decorations, not just walkable floor. Concave shapes are fine;
+  self-intersecting ones triangulate into garbage.
+- **`RoomTracker`** — finds the local player's room each frame and caches each
+  room's polygon as a world-space mesh (`PolygonCollider2D.CreateMesh`).
+- **`RoomOcclusionFeature`** + `Spooky/RoomOcclusion` — stencils the current
+  room's mesh, then fills everywhere the stencil did not mark.
+
+**Rooms are visibility units, not architectural ones.** A hallway players
+should see down end to end is one Room however many doorways it has, and a
+large room reveals all of itself the moment you enter.
+
+**Membership is sticky.** A different room displaces the current one, but
+being inside *no* room — a doorway, a seam between polygons — keeps the last
+one. Without that, gaps flicker.
+
+**Crossing cross-fades.** Both rooms are stencilled for `transitionSeconds`
+while the old one blacks out, so the screen never blinks between them.
+
+Ordering matters: the feature must sit **above** `Vhs Render Feature` in
+`Renderer2D`, so the distortion applies to the masked image and not a clean
+one.
+
+Gotchas:
+
+- Creating a material with right-click → Create → Material gives it the
+  **default sprite shader**, not the one you right-clicked. Set Shader to
+  `Spooky/RoomOcclusion` by hand or there is no Occlusion Color to set.
+- Test the mask in **red**, not black. Against a house lit at 0.08 global,
+  black-on-black cannot be told from the mask never rendering.
+
 ### Overhead art
 
 Wall tops and anything else that should draw over the player live on their own
@@ -126,6 +164,20 @@ animation one. Three settings have to agree:
 Changing the pivot moves the sprite relative to its transform, so
 `DoorTile.leafOffset` **and** the prefab's collider offset both need retuning
 afterward. Expect to redo them together.
+
+### Interaction range is per-object
+
+`Interactable.extraInteractRange` adds to the player's base range for that one
+object — a tall vertical door needs more reach than a typewriter.
+
+Three places have to agree, or the prompt and the interaction disagree:
+
+- `PlayerInteractor`'s sweep radius includes `maxExtraInteractRange`, so
+  objects granting themselves reach are found at all. **Keep it at least as
+  large as the biggest `extraInteractRange` in the scene.**
+- The per-object test uses that object's own allowance.
+- The **server's** re-check includes it too. Leave it out and the client draws
+  a prompt the server then silently refuses.
 
 ### Gotcha: interaction range measured from the pivot
 
